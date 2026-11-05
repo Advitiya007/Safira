@@ -41,7 +41,7 @@ export default function TrustSection() {
               </span>
               <blockquote className="relative z-10 pt-6">
                 <p className="font-headline text-2xl lg:text-3xl font-bold text-[#3e0021] leading-snug mb-6">
-                  "SafeHer India represents the kind of grassroots innovation
+                  "Safira represents the kind of grassroots innovation
                   that makes our cities safer for every woman."
                 </p>
                 <footer className="font-label text-sm text-[#8A2B57] font-semibold">

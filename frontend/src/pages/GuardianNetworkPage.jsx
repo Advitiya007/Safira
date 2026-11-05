@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { UserPlus, Shield, Phone, Edit2, Trash2, CheckCircle, Clock, Loader2, Info } from 'lucide-react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { UserPlus, Shield, Phone, Edit2, Trash2, CheckCircle, Clock, Loader2, Info, Eye, EyeOff } from 'lucide-react';
 import { guardianAPI } from '../utils/api';
 function VerificationButton({ guardian, onVerify }) {
     const [status, setStatus] = useState('idle'); // idle, verifying, cooldown
@@ -14,14 +14,12 @@ function VerificationButton({ guardian, onVerify }) {
         if (status === 'cooldown' && timeLeft > 0) {
             const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
             return () => clearTimeout(t);
-        } else if (status === 'cooldown' && timeLeft === 0) {
-            setStatus('idle');
         }
     }, [status, timeLeft]);
     if (status === 'verifying') {
         return <span className="text-[#4B7FBE] font-bold flex items-center gap-2 text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Sending...</span>;
     }
-    if (status === 'cooldown') {
+    if (status === 'cooldown' && timeLeft > 0) {
         return <span className="text-gray-400 font-bold flex items-center gap-2 text-sm"><Clock className="w-4 h-4" /> Resend? ({timeLeft}s)</span>;
     }
 
@@ -32,12 +30,16 @@ function VerificationButton({ guardian, onVerify }) {
 
 export default function GuardianNetworkPage() {
     const [guardians, setGuardians] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({ guardianName: '', guardianPhone: '', relationship: 'Friend' });
     const [editingGuardian, setEditingGuardian] = useState(null);
+    const [revealedPhones, setRevealedPhones] = useState({});
     const [toast, setToast] = useState(null); // { message, type }
     const MAX_GUARDIANS = 5;
     const isLimitReached = guardians.length >= MAX_GUARDIANS;
+    const showToast = useCallback((message, type = 'success') => {
+        setToast({ message, type });
+    }, []);
+
     useEffect(() => {
         const fetchGuardians = async () => {
             try {
@@ -45,15 +47,13 @@ export default function GuardianNetworkPage() {
                 if (response.success && response.data) {
                     setGuardians(response.data);
                 }
-            } catch (err) {
-                console.error("Failed to fetch guardians", err);
+            } catch (error) {
+                console.error("Failed to fetch guardians", error);
                 showToast("Failed to load guardians", "error");
-            } finally {
-                setLoading(false);
             }
         };
         fetchGuardians();
-    }, []);
+    }, [showToast]);
     useEffect(() => {
         if (toast) {
             const timer = setTimeout(() => setToast(null), 3000);
@@ -67,9 +67,6 @@ export default function GuardianNetworkPage() {
         window.addEventListener('keydown', handleEsc);
         return () => window.removeEventListener('keydown', handleEsc);
     }, []);
-    const showToast = (message, type = 'success') => {
-        setToast({ message, type });
-    };
     const handleAdd = async (e) => {
         e.preventDefault();
         if (!formData.guardianName || !formData.guardianPhone || isLimitReached) return;
@@ -87,7 +84,7 @@ export default function GuardianNetworkPage() {
             await guardianAPI.removeGuardian(id);
             setGuardians(guardians.filter(g => (g._id || g.id) !== id));
             showToast('Guardian removed');
-        } catch (err) {
+        } catch {
             showToast('Failed to remove guardian', 'error');
         }
     };
@@ -101,12 +98,12 @@ export default function GuardianNetworkPage() {
                 setEditingGuardian(null);
                 showToast('Guardian updated successfully');
             }
-        } catch (err) {
+        } catch {
             showToast('Failed to update guardian', 'error');
         }
     };
     const handleVerifySuccess = (guardian) => {
-        showToast(`Verification SMS sent to ${guardian.guardianPhone}`);
+        showToast(`Verification request prepared for ${maskPhone(guardian.guardianPhone)}`);
     };
     const handleTestAlert = (guardian) => {
         showToast(`Test alert sent to ${guardian.guardianName}`, 'success');
@@ -121,6 +118,7 @@ export default function GuardianNetworkPage() {
         if (!name) return '??';
         return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
     };
+    const maskPhone = (phone = '') => `••••••${phone.slice(-4)}`;
     return (
         <div className="max-w-7xl mx-auto px-8 py-12 relative">
 
@@ -307,7 +305,24 @@ export default function GuardianNetworkPage() {
                                     <div className="mt-6 space-y-4">
                                         <div className="flex items-center gap-3 text-sm text-[#2D1B2E] font-medium bg-gray-50 p-3 rounded-xl">
                                             <Phone className="w-4 h-4 text-gray-400" />
-                                            {guardian.guardianPhone}
+                                            <span className="flex-1 font-mono" aria-label="Trusted contact phone number">
+                                                {revealedPhones[guardian._id || guardian.id]
+                                                    ? guardian.guardianPhone
+                                                    : maskPhone(guardian.guardianPhone)}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setRevealedPhones((current) => ({
+                                                    ...current,
+                                                    [guardian._id || guardian.id]: !current[guardian._id || guardian.id],
+                                                }))}
+                                                className="rounded-md p-1.5 text-gray-500 hover:bg-white hover:text-primary"
+                                                aria-label={revealedPhones[guardian._id || guardian.id] ? 'Hide phone number' : 'Show phone number'}
+                                            >
+                                                {revealedPhones[guardian._id || guardian.id]
+                                                    ? <EyeOff className="h-4 w-4" />
+                                                    : <Eye className="h-4 w-4" />}
+                                            </button>
                                         </div>
 
                                         <div className="flex items-center justify-between px-1">

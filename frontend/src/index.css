@@ -3,7 +3,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* SafeHer India Premium Design System */
+  /* Safira Premium Design System */
   --color-primary: #8a2b57;
   --color-primary-container: #a84370;
   --color-secondary: #844886;
@@ -23,6 +23,93 @@
   --font-body: 'Noto Serif', serif;
   --font-label: 'Manrope', sans-serif;
   --font-serif: 'Noto Serif', serif;
+}
+
+html[data-theme="green"] {
+  --color-primary: #15803d;
+  --color-primary-container: #166534;
+  --color-secondary: #0f766e;
+  --color-background: #f7fbf8;
+  --color-surface: #f7fbf8;
+  --color-on-surface: #17251c;
+  --color-on-surface-variant: #3f5747;
+  --color-outline: #748a7b;
+  --color-outline-variant: #c3d6c9;
+  --color-surface-container-high: #e3efe7;
+  --color-surface-container-highest: #d7e8dc;
+  --color-surface-container-low: #edf6f0;
+  --color-surface-container-lowest: #ffffff;
+}
+
+html[data-theme="blue"] {
+  --color-primary: #2563eb;
+  --color-primary-container: #1d4ed8;
+  --color-secondary: #0891b2;
+  --color-background: #f7faff;
+  --color-surface: #f7faff;
+  --color-on-surface: #172033;
+  --color-on-surface-variant: #42516a;
+  --color-outline: #75839b;
+  --color-outline-variant: #c8d4e5;
+  --color-surface-container-high: #e5eefb;
+  --color-surface-container-highest: #d8e5f7;
+  --color-surface-container-low: #eef4fc;
+  --color-surface-container-lowest: #ffffff;
+}
+
+html[data-theme="black"] {
+  --color-primary: #111827;
+  --color-primary-container: #000000;
+  --color-secondary: #374151;
+  --color-background: #f8f8f8;
+  --color-surface: #f8f8f8;
+  --color-on-surface: #161616;
+  --color-on-surface-variant: #444444;
+  --color-outline: #777777;
+  --color-outline-variant: #d0d0d0;
+  --color-surface-container-high: #eeeeee;
+  --color-surface-container-highest: #e4e4e4;
+  --color-surface-container-low: #f1f1f1;
+  --color-surface-container-lowest: #ffffff;
+}
+
+html[data-theme] [class*="text-[#8B4A6A]"],
+html[data-theme] [class*="text-[#C94A7D]"] {
+  color: var(--color-primary) !important;
+}
+
+html[data-theme] [class*="bg-[#8B4A6A]"],
+html[data-theme] [class*="bg-[#C94A7D]"] {
+  background-color: var(--color-primary) !important;
+}
+
+html[data-theme] [class*="bg-[#FDF0F6]"] {
+  background-color: color-mix(in srgb, var(--color-primary) 8%, white) !important;
+}
+
+html[data-theme] [class*="bg-[#8B4A6A]/5"],
+html[data-theme] [class*="bg-[#C94A7D]/5"] {
+  background-color: color-mix(in srgb, var(--color-primary) 5%, transparent) !important;
+}
+
+html[data-theme] [class*="bg-[#8B4A6A]/10"],
+html[data-theme] [class*="bg-[#C94A7D]/10"] {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+
+html[data-theme] [class*="bg-[#8B4A6A]/20"],
+html[data-theme] [class*="bg-[#C94A7D]/20"] {
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
+html[data-theme] [class*="border-[#8B4A6A]"],
+html[data-theme] [class*="border-[#C94A7D]"] {
+  border-color: var(--color-primary) !important;
+}
+
+html[data-theme] [class*="hover:text-[#8B4A6A]"]:hover,
+html[data-theme] [class*="hover:text-[#C94A7D]"]:hover {
+  color: var(--color-primary-container) !important;
 }
 
 @layer base {

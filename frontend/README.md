@@ -1,6 +1,6 @@
-# 🖥️ SafeHer India - Frontend
+# Safira Frontend
 
-The React-based frontend for the SafeHer India safety platform. Built with a focus on high performance, responsiveness, and a warm wellness-oriented user experience.
+The React-based frontend for Safira, a women-first safety and wellness platform.
 
 ## 🚀 Getting Started
 
@@ -34,6 +34,24 @@ npm run build
 - **Maps**: [Leaflet](https://leafletjs.org/) & [React Leaflet](https://react-leaflet.js.org/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Data Fetching**: [Axios](https://axios-http.com/)
+- **Real-time**: Socket.IO client with one shared authenticated connection.
+
+Set `VITE_API_URL` to the backend API URL (including `/api`). Socket.IO uses that
+backend host by default; set `VITE_SOCKET_URL` only when the socket server uses a
+different origin. The shared safety-tracking context owns location state and starts
+one `watchPosition()` watcher only after `startTracking()` is requested. Its
+`useSafetyTracking()` hook shares tracking state, start/stop actions, authorized
+contact subscription actions, and received contact locations across pages.
+
+### Safe Route Navigation
+
+The Map page uses the public OSRM driving router for up to three route alternatives
+and Nominatim for user-submitted destination searches. Route corridors are evaluated
+with one backend Overpass request and cached for 10 minutes. No API key is required.
+`VITE_ROUTING_URL` can point to a compatible OSRM instance; the default public
+router is intended for modest/demo use and may be rate-limited. Consider a
+self-hosted or contracted routing service for production traffic. The public
+Nominatim service is queried only after the user submits a search (not as autocomplete).
 
 ---
 

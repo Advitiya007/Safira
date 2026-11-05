@@ -1,6 +1,6 @@
-const express = require('express');
-const { triggerSOS, getSOSHistory, resolveSOS, getSOS } = require('../controllers/sosController');
-const { verifyToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { triggerSOS, getSOSHistory, resolveSOS, getSOS } from '../controllers/sosController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.route('/:id')
     .put(resolveSOS);
 router.put('/:id/resolve', resolveSOS);
 
-module.exports = router;
+export default router;

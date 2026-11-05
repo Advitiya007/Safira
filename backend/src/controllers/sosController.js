@@ -1,6 +1,6 @@
-const SOS = require('../models/SOS');
-const Guardian = require('../models/Guardian');
-const { logActivity } = require('./activityController');
+import SOS from '../models/SOS.js';
+import Guardian from '../models/Guardian.js';
+import { logActivity } from './activityController.js';
 
 const triggerSOS = async (req, res, next) => {
     try {
@@ -32,7 +32,9 @@ const triggerSOS = async (req, res, next) => {
 
 const getSOSHistory = async (req, res, next) => {
     try {
-        const history = await SOS.find({ userId: req.user.userId }).sort({ triggeredAt: -1 }).populate('guardiansNotified');
+        const history = await SOS.find({ userId: req.user.userId })
+            .sort({ triggeredAt: -1 })
+            .populate('guardiansNotified', 'guardianName relationship isVerified');
         res.status(200).json({ success: true, message: 'SOS history fetched', data: history });
     } catch (err) {
         next(err);
@@ -67,7 +69,8 @@ const resolveSOS = async (req, res, next) => {
 const getSOS = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const sos = await SOS.findOne({ _id: id, userId: req.user.userId }).populate('guardiansNotified');
+        const sos = await SOS.findOne({ _id: id, userId: req.user.userId })
+            .populate('guardiansNotified', 'guardianName relationship isVerified');
 
         if (!sos) {
             res.status(404);
@@ -80,4 +83,4 @@ const getSOS = async (req, res, next) => {
     }
 };
 
-module.exports = { triggerSOS, getSOSHistory, resolveSOS, getSOS };
+export { triggerSOS, getSOSHistory, resolveSOS, getSOS };

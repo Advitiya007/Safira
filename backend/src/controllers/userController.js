@@ -1,4 +1,15 @@
-const User = require('../models/User');
+import User from '../models/User.js';
+import { decryptContact, encryptContact } from '../services/contactEncryptionService.js';
+
+const serializeUser = (user) => {
+    const data = user.toObject ? user.toObject() : { ...user };
+    data.phone = decryptContact(data.phone);
+    data.emergencyContactPhone = decryptContact(data.emergencyContactPhone);
+    delete data.password;
+    delete data.__v;
+    delete data.contactEncryptionVersion;
+    return data;
+};
 
 const getProfile = async (req, res, next) => {
     try {
@@ -7,7 +18,7 @@ const getProfile = async (req, res, next) => {
             res.status(404);
             throw new Error('User not found');
         }
-        res.status(200).json({ success: true, message: 'Profile fetched', data: user });
+        res.status(200).json({ success: true, message: 'Profile fetched', data: serializeUser(user) });
     } catch (err) {
         next(err);
     }
@@ -22,14 +33,24 @@ const updateProfile = async (req, res, next) => {
             throw new Error('User not found');
         }
 
+        if (phone && !/^\d{10}$/.test(phone)) {
+            res.status(400);
+            throw new Error('Phone number must be exactly 10 digits');
+        }
+        if (emergencyContactPhone && !/^\d{10}$/.test(emergencyContactPhone)) {
+            res.status(400);
+            throw new Error('Emergency contact phone number must be exactly 10 digits');
+        }
+
         if (fullName) user.fullName = fullName;
-        if (phone) user.phone = phone;
+        if (phone) user.phone = encryptContact(phone);
         if (emergencyContactName) user.emergencyContactName = emergencyContactName;
-        if (emergencyContactPhone) user.emergencyContactPhone = emergencyContactPhone;
+        if (emergencyContactPhone) user.emergencyContactPhone = encryptContact(emergencyContactPhone);
+        user.contactEncryptionVersion = 1;
 
         await user.save();
 
-        res.status(200).json({ success: true, message: 'Profile updated', data: user });
+        res.status(200).json({ success: true, message: 'Profile updated', data: serializeUser(user) });
     } catch (err) {
         next(err);
     }
@@ -80,4 +101,4 @@ const deleteAccount = async (req, res, next) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, changePassword, deleteAccount };
+export { getProfile, updateProfile, changePassword, deleteAccount };

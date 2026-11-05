@@ -1,292 +1,393 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Shield,
-  MapPin,
-  Users,
-  Bell,
-  TrendingUp,
-  CheckCircle,
-  AlertTriangle,
   ArrowUpRight,
+  Bell,
+  CheckCircle2,
   Clock,
-  Loader2
+  Heart,
+  Loader2,
+  MapPin,
+  Newspaper,
+  Shield,
+  Users,
+  XCircle,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import useLocation from '../hooks/useLocation';
+import { useSafetyTracking } from '../hooks/useSafetyTracking';
 import CustomMapContainer from '../components/Map/MapContainer';
-import StatusCard from '../components/Dashboard/StatusCard';
-import { activityAPI, guardianAPI } from '../utils/api';
+import { activityAPI, dashboardAPI, guardianAPI, sosAPI } from '../utils/api';
+import { WELLNESS_GUIDES } from '../data/wellnessGuides';
 
-const AnimatedCounter = ({ label, target, duration, icon: Icon, color, bg, progressBg }) => {
-  const [count, setCount] = useState(0);
-  const animatedRef = useRef(false);
+const StatCard = ({ icon, label, value, detail, color }) => (
+  <div className="card-premium flex min-w-0 items-center gap-4 p-5 sm:p-6">
+    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${color}`}>
+      {createElement(icon, { className: 'h-6 w-6' })}
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-bold uppercase tracking-wider text-[#6B5B6B]">{label}</p>
+      <p className="mt-1 text-2xl font-black tabular-nums text-[#2D1B2E]">{value}</p>
+      <p className="truncate text-xs text-[#6B5B6B]">{detail}</p>
+    </div>
+  </div>
+);
 
-  useEffect(() => {
-    if (animatedRef.current || target === 0) {
-      setCount(target);
-      return;
-    }
-    animatedRef.current = true;
-    
-    let start = 0;
-    const fps = 60;
-    const increment = target / (duration * fps);
-    
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.ceil(start));
-      }
-    }, 1000 / fps);
-    
-    return () => clearInterval(timer);
-  }, [target, duration]);
-
-  const percentage = target > 0 ? (count / target) * 100 : 100;
-
+const SetupCheck = ({ complete, title, detail }) => {
+  const icon = complete ? CheckCircle2 : XCircle;
   return (
-    <div className="card-premium flex flex-col justify-between p-8 relative overflow-hidden group">
-      <div className="flex items-center gap-6 z-10 relative">
-        <div className={`w-14 h-14 rounded-2xl ${bg} ${color} flex items-center justify-center`}>
-          <Icon className="w-7 h-7" />
-        </div>
-        <div>
-          <p className="text-[11px] font-bold text-[#6B5B6B] uppercase tracking-[0.2em] mb-1">{label}</p>
-          <p className="text-4xl font-black text-[#2D1B2E] tabular-nums">{count}</p>
-        </div>
-      </div>
-      {/* Animated progress bar at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gray-50">
-        <div 
-          className={`h-full ${progressBg} transition-all ease-out`} 
-          style={{ width: `${percentage}%`, transitionDuration: '100ms' }} 
-        />
+    <div className="flex items-start gap-3">
+      {createElement(icon, { className: `mt-0.5 h-5 w-5 shrink-0 ${complete ? 'text-emerald-600' : 'text-gray-400'}` })}
+      <div>
+        <p className="text-sm font-bold text-[#2D1B2E]">{title}</p>
+        <p className="text-xs text-[#6B5B6B]">{detail}</p>
       </div>
     </div>
   );
 };
 
+const formatRelativeTime = (dateString) => {
+  const timestamp = new Date(dateString).getTime();
+  if (!Number.isFinite(timestamp)) return 'Time unavailable';
+  const hoursAgo = Math.max(0, Math.floor((Date.now() - timestamp) / (1000 * 60 * 60)));
+  if (hoursAgo === 0) return 'Just now';
+  if (hoursAgo < 24) return `${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
+  if (hoursAgo < 48) return 'Yesterday';
+  const daysAgo = Math.floor(hoursAgo / 24);
+  return `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`;
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return Number.isFinite(date.getTime())
+    ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(date)
+    : null;
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
-  const [isSafe, setIsSafe] = useState(true);
-  const { location, pois, isLoading: isMapLoading } = useLocation({ radius: 5000, maxEach: 4 });
-  const [activities, setActivities] = useState([]);
-  const [verifiedGuardians, setVerifiedGuardians] = useState(0);
+  const { location, pois, isLoading: isMapLoading, error: locationError } = useLocation({
+    radius: 5000,
+    maxEach: 4,
+  });
+  const { trackingActive } = useSafetyTracking();
+  const [activities, setActivities] = useState(null);
+  const [verifiedGuardians, setVerifiedGuardians] = useState(null);
+  const [sosHistory, setSosHistory] = useState(null);
+  const [news, setNews] = useState(null);
+  const [newsError, setNewsError] = useState('');
+  const [dashboardError, setDashboardError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [newsRetry, setNewsRetry] = useState(0);
+  const wellnessGuide = WELLNESS_GUIDES[new Date().getDate() % WELLNESS_GUIDES.length];
+  const activeSosCount = (sosHistory || []).filter((item) => item.status === 'triggered').length;
+  const setupReady = trackingActive && verifiedGuardians > 0;
+  const setupStatusAvailable = verifiedGuardians !== null;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [activityRes, guardianRes] = await Promise.all([
-          activityAPI.getActivities(),
-          guardianAPI.getGuardians()
-        ]);
-        if (activityRes.success && activityRes.data) {
-          setActivities(activityRes.data.slice(0, 3)); // Top 3
-        }
-        if (guardianRes.success && guardianRes.data) {
-          setVerifiedGuardians(guardianRes.data.filter(g => g.verified).length);
-        }
-      } catch (e) {
-        console.error("Error fetching dashboard data", e);
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    Promise.allSettled([
+      activityAPI.getActivities(signal),
+      guardianAPI.getGuardians(signal),
+      sosAPI.getHistory(signal),
+    ]).then(([activityResult, guardianResult, sosResult]) => {
+      if (signal.aborted) return;
+
+      const failures = [];
+      if (activityResult.status === 'fulfilled' && activityResult.value?.success) {
+        setActivities(activityResult.value.data || []);
+      } else {
+        setActivities(null);
+        failures.push('Recent activity');
       }
-    };
-    fetchData();
+
+      if (guardianResult.status === 'fulfilled' && guardianResult.value?.success) {
+        const activeVerified = (guardianResult.value.data || []).filter(
+          (guardian) => guardian.isVerified && guardian.status === 'active',
+        );
+        setVerifiedGuardians(activeVerified.length);
+      } else {
+        setVerifiedGuardians(null);
+        failures.push('Trusted contacts');
+      }
+
+      if (sosResult.status === 'fulfilled' && sosResult.value?.success) {
+        setSosHistory(sosResult.value.data || []);
+      } else {
+        setSosHistory(null);
+        failures.push('SOS records');
+      }
+
+      if (failures.length) {
+        setDashboardError(`Could not load ${failures.join(', ').toLowerCase()}.`);
+      }
+      setIsLoading(false);
+    });
+
+    return () => controller.abort();
   }, []);
 
-  const getRelativeTime = (dateString) => {
-    const hoursAgo = Math.floor((new Date() - new Date(dateString)) / (1000 * 60 * 60));
-    if (hoursAgo === 0) return "Just now";
-    if (hoursAgo < 24) return `${hoursAgo} hours ago`;
-    if (hoursAgo < 48) return "Yesterday";
-    return `${Math.floor(hoursAgo / 24)} days ago`;
-  };
+  useEffect(() => {
+    const controller = new AbortController();
+    dashboardAPI.getPositiveCurrentAffairs(controller.signal, newsRetry > 0)
+      .then((response) => {
+        if (controller.signal.aborted) return;
+        if (!response?.success) throw new Error('Current affairs feed returned an unsuccessful response');
+        setNews(response.data);
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setNews(null);
+        setNewsError('Positive current-affairs feed is temporarily unavailable.');
+      });
+
+    return () => controller.abort();
+  }, [newsRetry]);
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-12">
-      <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-bold font-serif text-[#2D1B2E] tracking-tight">
-            Welcome back, <span className="text-[#8B4A6A]">{user?.fullName || 'Priya'}</span>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#8B4A6A]">
+            Safira dashboard
+          </p>
+          <h1 className="break-words font-serif text-3xl font-bold tracking-tight text-[#2D1B2E] sm:text-4xl">
+            Welcome back, <span className="text-[#8B4A6A]">{user?.fullName || 'there'}</span>
           </h1>
-          <p className="text-[#6B5B6B] font-body mt-2">Your safety journey is active and monitored.</p>
+          <p className="mt-2 text-sm text-[#6B5B6B] sm:text-base">
+            A snapshot of your safety tools, trusted contacts and local information.
+          </p>
         </div>
-        
-        <div className="flex flex-col items-end gap-2">
-          <button 
-            onClick={() => setIsSafe(!isSafe)} 
-            className="text-[10px] font-bold text-gray-400 hover:text-[#8B4A6A] uppercase tracking-widest transition-colors"
-          >
-            Toggle Demo Mode
-          </button>
-          <StatusCard isSafe={isSafe} />
+        <div className={`w-fit rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide ${setupReady ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>
+          Level 1 · {!setupStatusAvailable ? 'Status unavailable' : setupReady ? 'Setup ready' : 'Setup incomplete'}
         </div>
       </header>
 
-      {/* Safety Score Ring Card */}
-      <div className="card-premium p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-8">
-        <div className="flex items-center gap-8">
-          <div className="relative w-32 h-32 flex-shrink-0">
-            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-              <circle cx="50" cy="50" r="40" stroke="#f3f4f6" strokeWidth="8" fill="none" />
-              <circle 
-                cx="50" cy="50" r="40" 
-                stroke="url(#roseGradient)" 
-                strokeWidth="8" fill="none" 
-                strokeDasharray="251.2" 
-                strokeDashoffset={251.2 * (1 - 0.78)} 
-                strokeLinecap="round" 
-                className="transition-all duration-1000 ease-out"
-              />
-              <defs>
-                <linearGradient id="roseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#8B4A6A" />
-                  <stop offset="100%" stopColor="#C94A7D" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-3xl font-black text-[#2D1B2E] leading-none">
-                78<span className="text-sm font-bold text-gray-400">/100</span>
-              </span>
-              <span className="text-[9px] font-bold text-[#6B5B6B] uppercase tracking-widest mt-1">Safety Score</span>
+      {dashboardError && (
+        <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {dashboardError} Some dashboard indicators may be incomplete.
+        </p>
+      )}
+
+      {activeSosCount > 0 && (
+        <section role="alert" className="mb-6 flex flex-col gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-bold text-red-900">
+              {activeSosCount} active SOS record{activeSosCount === 1 ? '' : 's'}
+            </p>
+            <p className="text-sm text-red-800">Review your SOS status and resolve it when appropriate.</p>
+          </div>
+          <Link to="/sos" className="inline-flex items-center gap-2 self-start rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800 sm:self-auto">
+            Open SOS <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </section>
+      )}
+
+      <section aria-label="Level 1 safety setup" className="card-premium mb-6 grid gap-6 p-5 sm:mb-8 sm:grid-cols-[minmax(0,1fr)_minmax(15rem,0.8fr)] sm:p-6">
+        <div>
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#8B4A6A]/10 text-[#8B4A6A]">
+              <Shield className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="font-serif text-xl font-bold text-[#2D1B2E]">Level 1 safety setup</h2>
+              <p className="text-xs text-[#6B5B6B]">Account setup indicators, not a safety guarantee.</p>
             </div>
           </div>
-          <div>
-            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
-              Level 1: SECURE
-            </span>
-            <h3 className="text-xl font-bold font-serif text-[#2D1B2E] mb-2">Excellent Safety Posture</h3>
-            <p className="text-sm text-[#6B5B6B]">You are well protected. Your network is active.</p>
-          </div>
+          <p className="max-w-2xl text-sm leading-relaxed text-[#6B5B6B]">
+            {setupReady
+              ? 'Live tracking is on and you have at least one verified active trusted contact.'
+              : 'Turn on live tracking and add a verified trusted contact to complete these setup indicators.'}
+          </p>
         </div>
-        <div className="space-y-3 bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-bold text-[#2D1B2E]">Location sharing active</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-bold text-[#2D1B2E]">Guardians verified</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-bold text-[#2D1B2E]">No recent incidents</span>
-          </div>
+        <div className="space-y-4 rounded-xl bg-gray-50 p-4">
+          <SetupCheck
+            complete={trackingActive}
+            title={trackingActive ? 'Live tracking is active' : 'Live tracking is off'}
+            detail={trackingActive ? 'Location updates are being shared for this session.' : 'Enable it from the map or tracking controls when needed.'}
+          />
+          <SetupCheck
+            complete={verifiedGuardians > 0}
+            title={verifiedGuardians === null
+              ? 'Trusted contact status unavailable'
+              : `${verifiedGuardians} verified trusted contact${verifiedGuardians === 1 ? '' : 's'}`}
+            detail={verifiedGuardians === null
+              ? 'Contact status is unavailable right now.'
+              : 'Only active contacts with verified status are counted.'}
+          />
         </div>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <AnimatedCounter 
-          label="Safe Days" target={user?.createdAt ? Math.max(1, Math.floor((new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24))) : 1} duration={1.5} 
-          icon={Shield} color="text-green-600" bg="bg-green-50" progressBg="bg-green-500" 
+      <section aria-label="Dashboard summary" className="mb-6 grid grid-cols-1 gap-3 sm:mb-8 sm:grid-cols-3 sm:gap-4">
+        <StatCard
+          icon={Users}
+          label="Verified contacts"
+          value={isLoading || verifiedGuardians === null ? '—' : verifiedGuardians}
+          detail={verifiedGuardians === null ? 'Status unavailable' : 'Active trusted contacts'}
+          color="bg-blue-50 text-blue-700"
         />
-        <AnimatedCounter 
-          label="Alerts Triggered" target={activities.filter(a => a.action === 'sos_triggered').length} duration={0.1} 
-          icon={Bell} color="text-[#8B4A6A]" bg="bg-[#8B4A6A]/10" progressBg="bg-[#8B4A6A]" 
+        <StatCard
+          icon={Bell}
+          label="SOS records"
+          value={isLoading || sosHistory === null ? '—' : sosHistory.length}
+          detail={sosHistory === null
+            ? 'Status unavailable'
+            : activeSosCount ? `${activeSosCount} currently active` : 'No active SOS records'}
+          color="bg-rose-50 text-rose-700"
         />
-        <AnimatedCounter 
-          label="Verified Guardians" target={verifiedGuardians} duration={0.8} 
-          icon={Users} color="text-[#4B7FBE]" bg="bg-[#4B7FBE]/10" progressBg="bg-[#4B7FBE]" 
+        <StatCard
+          icon={MapPin}
+          label="Mapped locations"
+          value={isMapLoading ? '—' : pois.length}
+          detail="Nearby support places shown"
+          color="bg-emerald-50 text-emerald-700"
         />
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Safety Map Card */}
-        <div className="lg:col-span-2 space-y-8">
-          <section className="card-premium overflow-hidden !p-0 flex flex-col">
-            <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white relative z-10">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-3 lg:gap-6">
+        <div className="min-w-0 space-y-5 lg:col-span-2 lg:space-y-6">
+          <section className="card-premium overflow-hidden !p-0">
+            <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="flex items-center gap-3">
-                <MapPin className="w-5 h-5 text-[#8B4A6A]" />
-                <h3 className="text-xl font-bold font-serif text-[#2D1B2E]">Live Safety Status</h3>
+                <MapPin className="h-5 w-5 text-[#8B4A6A]" />
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-[#2D1B2E]">Nearby map</h2>
+                  <p className="text-xs text-[#6B5B6B]">Your location and mapped support places</p>
+                </div>
               </div>
-              <Link to="/map" className="text-xs font-bold text-[#8B4A6A] hover:text-[#C94A7D] flex items-center gap-1 transition-colors">
-                Open Full Map <ArrowUpRight className="w-3 h-3" />
+              <Link to="/map" className="inline-flex items-center gap-1 self-start text-sm font-bold text-[#8B4A6A] hover:text-[#C94A7D] sm:self-auto">
+                Open full map <ArrowUpRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="h-80 bg-gray-50 relative z-0">
-              {/* Real Mini-Map */}
+            <div className="relative h-[18rem] bg-gray-50 sm:h-[22rem]">
               {isMapLoading ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-50">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#8B4A6A]" />
-                  <p className="text-sm font-bold text-[#6B5B6B] animate-pulse">Locating you…</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#8B4A6A]" />
+                  <p className="text-sm font-medium text-[#6B5B6B]">Loading map data…</p>
                 </div>
               ) : (
-                <div className="absolute inset-0">
-                  <CustomMapContainer location={location} pois={pois} />
-                </div>
+                <CustomMapContainer location={location} pois={pois} />
               )}
             </div>
+            {locationError && (
+              <p className="border-t border-gray-100 px-4 py-3 text-xs text-amber-800 sm:px-5">
+                {locationError}
+              </p>
+            )}
           </section>
 
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div 
-              className="bg-[#2D1B2E] text-white rounded-3xl p-8 relative overflow-hidden group"
-              style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%)' }}
-            >
-              <div className="relative z-10">
-                <h4 className="text-lg font-bold mb-2">Need Help?</h4>
-                <p className="text-sm text-gray-400 mb-6">Our 24/7 response team is ready to assist you.</p>
-                <Link to="/sos" className="inline-block bg-[#DC2626] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-black transition-colors">
-                  Contact Support
-                </Link>
+          <section className="card-premium p-5 sm:p-6">
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Newspaper className="h-5 w-5 shrink-0 text-[#8B4A6A]" />
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-[#2D1B2E]">Positive current affairs</h2>
+                  <p className="text-xs text-[#6B5B6B]">Keyword-screened headlines from an external feed</p>
+                </div>
               </div>
-              <TrendingUp className="absolute -bottom-10 -right-10 w-40 h-40 text-white/5 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500" />
+              <Link to="/current-affairs" aria-label="Open current affairs" className="shrink-0 text-[#8B4A6A]">
+                <ArrowUpRight className="h-5 w-5" />
+              </Link>
             </div>
-            
-            <div 
-              className="bg-[#8B4A6A] text-white rounded-3xl p-8 relative overflow-hidden group"
-              style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%)' }}
-            >
-              <div className="relative z-10">
-                <h4 className="text-lg font-bold mb-2">Quick Tip</h4>
-                <p className="text-sm text-white/80 mb-6">Keep your GPS on for more accurate safety alerts in your local area.</p>
-                <Link to="/wellness" className="inline-block bg-white/20 backdrop-blur-md text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-white/30 transition-colors">
-                  View Guides
-                </Link>
+            {newsError ? (
+              <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+                <p>{newsError}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNews(null);
+                    setNewsError('');
+                    setNewsRetry((attempt) => attempt + 1);
+                  }}
+                  className="mt-3 font-bold underline underline-offset-2"
+                >
+                  Try again
+                </button>
               </div>
-              <Shield className="absolute -bottom-10 -right-10 w-40 h-40 text-white/5 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500" />
+            ) : news === null ? (
+              <div className="flex items-center gap-2 py-4 text-sm text-[#6B5B6B]">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading headlines…
+              </div>
+            ) : news.items.length === 0 ? (
+              <p className="rounded-xl bg-gray-50 p-4 text-sm text-[#6B5B6B]">
+                No headlines matched the positive-content filter. Try again later.
+              </p>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {news.items.slice(0, 3).map((item) => (
+                  <li key={item.url} className="py-3 first:pt-1 last:pb-1">
+                    <a href={item.url} target="_blank" rel="noreferrer" className="font-semibold leading-snug text-[#2D1B2E] hover:text-[#8B4A6A]">
+                      {item.title}
+                    </a>
+                    <p className="mt-1 text-xs text-[#6B5B6B]">
+                      {item.source}{item.publishedAt ? ` · ${formatDate(item.publishedAt)}` : ''}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-4 border-t border-gray-100 pt-3 text-[11px] leading-relaxed text-gray-500">
+              {news?.sourceName || 'External news feed'}
+              {news?.fetchedAt ? ` · Updated ${formatDate(news.fetchedAt)}` : ''}
+              {' · Headlines are keyword-screened and are not Safira alerts or independently verified.'}
+            </p>
+          </section>
+
+          <section className="card-premium p-5 sm:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <Heart className="h-5 w-5 text-[#C94A7D]" />
+              <div>
+                <h2 className="font-serif text-lg font-bold text-[#2D1B2E]">Wellness guide of the day</h2>
+                <p className="text-xs text-[#6B5B6B]">A daily selection from the Safira wellness library</p>
+              </div>
+            </div>
+            <div className="rounded-xl bg-[#FFF8F0] p-4 sm:p-5">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#8B4A6A]">{wellnessGuide.category}</p>
+              <h3 className="font-serif text-lg font-bold text-[#2D1B2E]">{wellnessGuide.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#6B5B6B]">{wellnessGuide.desc}</p>
+              <Link to="/wellness" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-[#8B4A6A] hover:text-[#C94A7D]">
+                Browse wellness guides <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </div>
           </section>
         </div>
 
-        {/* Recent Activity Feed */}
-        <div className="lg:col-span-1">
-          <section className="card-premium h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-8">
-              <Clock className="w-5 h-5 text-[#8B4A6A]" />
-              <h3 className="text-xl font-bold font-serif text-[#2D1B2E]">Recent Activity</h3>
+        <aside className="min-w-0">
+          <section className="card-premium p-5 sm:p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <Clock className="h-5 w-5 text-[#8B4A6A]" />
+              <h2 className="font-serif text-lg font-bold text-[#2D1B2E]">Recent activity</h2>
             </div>
-            <div className="flex-1 space-y-10">
-              {activities.length === 0 ? (
-                <div className="text-center text-gray-400 font-medium py-10">No recent activity</div>
-              ) : (
-                activities.map((act, i) => (
-                  <div key={i} className="flex gap-4 group">
-                    <div className="relative">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#8B4A6A] mt-1 ring-4 ring-[#8B4A6A]/10 relative z-10" />
-                      {i !== activities.length - 1 && <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[2px] h-[calc(100%+16px)] bg-gray-100" />}
+            {isLoading ? (
+              <div className="flex items-center gap-2 py-8 text-sm text-[#6B5B6B]">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading activity…
+              </div>
+            ) : activities === null ? (
+              <p className="py-8 text-center text-sm text-amber-800">Activity is temporarily unavailable.</p>
+            ) : activities.length === 0 ? (
+              <p className="py-8 text-center text-sm text-[#6B5B6B]">No recent activity to show.</p>
+            ) : (
+              <ul className="space-y-5">
+                {activities.slice(0, 5).map((activity, index) => (
+                  <li key={activity._id || `${activity.action}-${activity.timestamp}-${index}`} className="flex gap-3">
+                    <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#8B4A6A] ring-4 ring-[#8B4A6A]/10" />
+                    <div className="min-w-0">
+                      <p className="break-words text-sm font-bold capitalize text-[#2D1B2E]">
+                        {(activity.action || 'Activity').replaceAll('_', ' ')}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">{formatRelativeTime(activity.timestamp)}</p>
+                      <p className="mt-1 text-xs text-[#8B4A6A]">
+                        {activity.details?.latitude ? 'Location recorded' : 'System event'}
+                      </p>
                     </div>
-                    <div className="group-hover:translate-x-1 transition-transform">
-                      <h4 className="text-sm font-bold text-[#2D1B2E]">{act.action.replace('_', ' ').toUpperCase()}</h4>
-                      <p className="text-xs text-gray-400 font-medium mb-1.5">{getRelativeTime(act.timestamp)}</p>
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#8B4A6A] uppercase tracking-wider bg-[#8B4A6A]/5 px-2 py-1 rounded-md inline-flex">
-                        <MapPin className="w-3 h-3" />
-                        {act.details?.latitude ? 'Location Recorded' : 'System Event'}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            <button className="w-full mt-12 py-3.5 bg-gray-50 text-[#6B5B6B] text-xs font-bold rounded-xl hover:bg-[#8B4A6A] hover:text-white transition-colors uppercase tracking-widest">
-              View All History
-            </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
-        </div>
+        </aside>
       </div>
     </div>
   );

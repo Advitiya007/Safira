@@ -1,6 +1,6 @@
-const express = require('express');
-const { getProfile, updateProfile, changePassword, deleteAccount } = require('../controllers/userController');
-const { verifyToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { getProfile, updateProfile, changePassword, deleteAccount } from '../controllers/userController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.route('/profile')
 router.put('/change-password', changePassword);
 router.delete('/account', deleteAccount);
 
-module.exports = router;
+export default router;

@@ -25,7 +25,7 @@ export const ROUTES = {
     SETTINGS: '/settings',
 };
 
-export const APP_NAME = 'SafeHer India';
+export const APP_NAME = 'Safira';
 
 export const MOCK_USER = {
     name: 'Priya Sharma',
@@ -36,4 +36,3 @@ export const MOCK_USER = {
         phone: '+91 9823456781'
     }
 };
-

@@ -23,7 +23,7 @@
 
 SafeHer India is more than just an app; it's a digital guardian. Built to address the unique safety challenges faced by women in urban and rural India, it provides a comprehensive suite of tools ranging from immediate emergency response to proactive wellness and safety education.
 
-### 🆘 Why SafeHer?
+### 🆘 Why Safira?
 - **Unsafe Environments**: Real-time identification of safe zones.
 - **Panic Situations**: Instant SOS alerts to guardians and authorities.
 - **Solo Travel**: Verified routes and community-vetted safety data.

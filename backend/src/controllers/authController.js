@@ -1,7 +1,25 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Guardian = require('../models/Guardian');
-const { logActivity } = require('./activityController');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import Guardian from '../models/Guardian.js';
+import { logActivity } from './activityController.js';
+import { decryptContact, encryptContact, hashContact } from '../services/contactEncryptionService.js';
+
+const serializeUser = (user) => {
+    const data = user.toObject ? user.toObject() : { ...user };
+    data.phone = decryptContact(data.phone);
+    data.emergencyContactPhone = decryptContact(data.emergencyContactPhone);
+    delete data.password;
+    delete data.__v;
+    delete data.contactEncryptionVersion;
+    return data;
+};
+
+const serializeGuardian = (guardian) => ({
+    guardianId: guardian._id,
+    guardianName: guardian.guardianName,
+    guardianPhone: decryptContact(guardian.guardianPhone),
+    relationship: guardian.relationship,
+});
 
 const generateToken = (userId, email) => {
     return jwt.sign({ userId, email }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -44,6 +62,12 @@ const registerUser = async (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 message: 'Phone number must be exactly 10 digits'
+            });
+        }
+        if (emergencyContactPhone && !phoneRegex.test(emergencyContactPhone)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Emergency contact phone number must be exactly 10 digits'
             });
         }
 
@@ -97,10 +121,11 @@ const registerUser = async (req, res, next) => {
         const user = await User.create({
             fullName,
             email,
-            phone,
+            phone: encryptContact(phone),
             password,
             emergencyContactName,
-            emergencyContactPhone,
+            emergencyContactPhone: encryptContact(emergencyContactPhone),
+            contactEncryptionVersion: 1,
             termsAcceptedAt: new Date(),
             isActive: true,
             lastLogin: new Date()
@@ -119,10 +144,11 @@ const registerUser = async (req, res, next) => {
             }
 
             // Check if guardian already exists for this user
-            const existingGuardian = await Guardian.findOne({ 
-                userId: user._id, 
-                guardianPhone: emergencyContactPhone 
-            });
+            const guardianPhoneHash = hashContact(emergencyContactPhone);
+            const existingGuardian = await Guardian.findOne({
+                userId: user._id,
+                guardianPhoneHash,
+            }).select('+guardianPhoneHash');
             
             if (existingGuardian) {
                 return res.status(400).json({
@@ -134,7 +160,9 @@ const registerUser = async (req, res, next) => {
             guardian = await Guardian.create({
                 userId: user._id,
                 guardianName: emergencyContactName,
-                guardianPhone: emergencyContactPhone,
+                guardianPhone: encryptContact(emergencyContactPhone),
+                guardianPhoneHash,
+                contactEncryptionVersion: 1,
                 relationship: emergencyContactRelationship || 'Other',
                 status: 'active',
                 addedAt: Date.now(),
@@ -154,19 +182,13 @@ const registerUser = async (req, res, next) => {
                 userId: user._id,
                 fullName: user.fullName,
                 email: user.email,
-                phone: user.phone
+                phone: decryptContact(user.phone)
             }
         };
 
         if (guardian) {
-            responseData.guardian = {
-                guardianId: guardian._id,
-                guardianName: guardian.guardianName,
-                guardianPhone: guardian.guardianPhone,
-                relationship: guardian.relationship
-            };
+            responseData.guardian = serializeGuardian(guardian);
         }
-
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
@@ -208,7 +230,7 @@ const loginUser = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Logged in successfully',
-            data: { token, user }
+            data: { token, user: serializeUser(user) }
         });
     } catch (err) {
         next(err);
@@ -231,7 +253,7 @@ const getCurrentUser = async (req, res, next) => {
             res.status(404);
             throw new Error('User not found');
         }
-        res.status(200).json({ success: true, message: 'User fetched', data: user });
+        res.status(200).json({ success: true, message: 'User fetched', data: serializeUser(user) });
     } catch (err) {
         next(err);
     }
@@ -246,4 +268,4 @@ const refreshToken = async (req, res, next) => {
     }
 };
 
-module.exports = { registerUser, loginUser, logoutUser, getCurrentUser, refreshToken };
+export { registerUser, loginUser, logoutUser, getCurrentUser, refreshToken };

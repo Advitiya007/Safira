@@ -6,7 +6,7 @@ export default function TestimonialsSection() {
         {
             name: 'Aditi Rao',
             role: 'Student, Delhi',
-            quote: 'SafeHer has given me the confidence to attend late-night study sessions. The live map is incredibly accurate.',
+            quote: 'Safira has given me the confidence to attend late-night study sessions. The live map is incredibly useful.',
             rating: 5,
             img: 'https://i.pravatar.cc/100?img=32'
         },

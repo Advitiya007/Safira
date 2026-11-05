@@ -38,7 +38,7 @@ export default function Login() {
 
         {/* Mobile Header */}
         <div className="lg:hidden absolute top-0 left-0 w-full p-6 flex justify-between items-center bg-white/80 backdrop-blur-md">
-          <h1 className="font-headline text-2xl font-bold text-primary tracking-tight">SafeHer India</h1>
+          <h1 className="font-headline text-2xl font-bold text-primary tracking-tight">Safira</h1>
         </div>
 
         <div className="w-full max-w-[420px] bg-white rounded-[24px] p-10 relative z-10" style={{ boxShadow: "0 10px 40px -10px rgba(138, 43, 87, 0.12)" }}>
@@ -154,7 +154,7 @@ export default function Login() {
 
         <div className="relative z-10 h-full flex flex-col p-12 justify-start">
           <div className="flex items-center gap-4 mb-32">
-            <h1 className="font-headline text-3xl font-bold text-white tracking-tight">SafeHer India</h1>
+            <h1 className="font-headline text-3xl font-bold text-white tracking-tight">Safira</h1>
             <div className="h-4 w-[1px] bg-white/40"></div>
             <span className="font-label text-xs text-white/80 uppercase tracking-widest">Your Safety. Our Priority.</span>
           </div>

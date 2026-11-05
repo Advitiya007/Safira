@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../utils/api';
+import { connectSocket, disconnectSocket } from '../utils/socket';
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
@@ -18,6 +19,7 @@ export const useAuth = () => {
                 setUser(response.data);
             } else {
                 localStorage.removeItem('authToken');
+                disconnectSocket();
                 setUser(null);
             }
         } catch (error) {
@@ -25,6 +27,7 @@ export const useAuth = () => {
             // Don't log out immediately on network error, but if it's 401 we should
             if (error.message && error.message.includes('token') || error.message.includes('auth')) {
                 localStorage.removeItem('authToken');
+                disconnectSocket();
                 setUser(null);
             }
         } finally {
@@ -42,6 +45,7 @@ export const useAuth = () => {
             const response = await authAPI.login({ email, password });
             if (response.success && response.data?.token) {
                 localStorage.setItem('authToken', response.data.token);
+                connectSocket();
                 // Also response usually returns user data, let's set it
                 if (response.data.user) {
                     setUser(response.data.user);
@@ -66,6 +70,7 @@ export const useAuth = () => {
             console.error("Logout API failed, continuing local logout:", e);
         }
         localStorage.removeItem('authToken');
+        disconnectSocket();
         setUser(null);
         window.location.href = '/';
     };

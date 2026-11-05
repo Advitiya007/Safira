@@ -21,7 +21,7 @@ export default function AppDownloadSection() {
             </div>
 
             <h2 className="font-headline text-4xl lg:text-5xl font-bold text-white tracking-tight mb-6 leading-tight">
-              Keep SafeHer India<br />In Your Pocket
+              Keep Safira<br />In Your Pocket
             </h2>
 
             <p className="font-body text-lg text-rose-200/80 leading-relaxed mb-10 max-w-md">
@@ -101,7 +101,7 @@ export default function AppDownloadSection() {
                       <div className="w-7 h-7 rounded-full bg-[#8A2B57] flex items-center justify-center">
                         <span className="material-symbols-outlined text-xs text-white">shield</span>
                       </div>
-                      <span className="font-label text-xs font-bold text-[#3e0021]">SafeHer India</span>
+                      <span className="font-label text-xs font-bold text-[#3e0021]">Safira</span>
                     </div>
                   </div>
 

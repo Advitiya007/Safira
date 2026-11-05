@@ -1,5 +1,6 @@
 // API configuration and utility functions
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://safeher-indiasafeher-india-backend.onrender.com/api').replace(/\/+$/, '');
+// const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://safeher-indiasafeher-india-backend.onrender.com/api').replace(/\/+$/, '');
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 // Generic API request function
 export const apiRequest = async (endpoint, options = {}) => {
@@ -26,7 +27,6 @@ export const apiRequest = async (endpoint, options = {}) => {
   try {
     const response = await fetch(url, config);
     const data = await response.json();
-    
     if (!response.ok) {
       console.error(`[API Error Response]`, data);
       throw new Error(data.message || 'API request failed');
@@ -60,7 +60,7 @@ export const authAPI = {
 };
 
 export const guardianAPI = {
-  getGuardians: () => apiRequest('/guardians'),
+  getGuardians: (signal) => apiRequest('/guardians', { signal }),
   
   addGuardian: (guardianData) => apiRequest('/guardians', {
     method: 'POST',
@@ -81,11 +81,18 @@ export const sosAPI = {
     body: JSON.stringify(locationData),
   }),
   resolveSOS: (id) => apiRequest(`/sos/${id}/resolve`, { method: 'PUT' }),
-  getHistory: () => apiRequest('/sos/history'),
+  getHistory: (signal) => apiRequest('/sos/history', { signal }),
 };
 
 export const activityAPI = {
-  getActivities: () => apiRequest('/activities'),
+  getActivities: (signal) => apiRequest('/activities', { signal }),
+};
+
+export const dashboardAPI = {
+  getPositiveCurrentAffairs: (signal, refresh = false) => apiRequest(
+    `/dashboard/current-affairs${refresh ? '?refresh=true' : ''}`,
+    { signal },
+  ),
 };
 
 export const userAPI = {
@@ -93,6 +100,42 @@ export const userAPI = {
     method: 'PUT',
     body: JSON.stringify(data),
   })
+};
+
+export const locationAPI = {
+  getNearbyPlaces: (latitude, longitude, radius = 5000, signal) => {
+    const params = new URLSearchParams({
+      latitude: String(latitude),
+      longitude: String(longitude),
+      radius: String(radius),
+    });
+    return apiRequest(`/locations/nearby?${params}`, { signal });
+  },
+  scoreRoutes: (routes, signal) => apiRequest('/locations/route-safety', {
+    method: 'POST',
+    body: JSON.stringify({ routes }),
+    signal,
+  }),
+};
+
+export const safeRouteAPI = {
+  getCities: (signal) => apiRequest('/cities', { signal }),
+  geocode: (query, signal) => {
+    const params = new URLSearchParams({ q: query });
+    return apiRequest(`/geocode?${params}`, { signal });
+  },
+  locateCity: (latitude, longitude, signal) => {
+    const params = new URLSearchParams({ latitude: String(latitude), longitude: String(longitude) });
+    return apiRequest(`/cities/locate?${params}`, { signal });
+  },
+  getCoverage: (cityId, signal) => apiRequest(`/cities/${cityId}/coverage`, { signal }),
+  analyze: (request, signal) => apiRequest('/safe-routes/analyze', {
+    method: 'POST',
+    body: JSON.stringify(request),
+    signal,
+  }),
+  getAnalysis: (id, signal) => apiRequest(`/safe-routes/${id}`, { signal }),
+  getAnalysisDetails: (id, signal) => apiRequest(`/safe-routes/${id}/details`, { signal }),
 };
 
 export default apiRequest;

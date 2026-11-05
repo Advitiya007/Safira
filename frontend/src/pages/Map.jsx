@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  MapPin,
   Search,
   Shield,
   Phone,
@@ -10,25 +9,84 @@ import {
   Hospital,
   ShieldAlert,
   Info,
-  Loader2
+  Loader2,
+  Route,
+  XCircle
 } from 'lucide-react';
 import CustomMapContainer from '../components/Map/MapContainer';
+import { SafeRouteAlternatives, SafeRouteControls } from '../components/Map/SafeRoutePanel';
 import useLocation from '../hooks/useLocation';
+import { getSafeRoutes, geocodeDestination } from '../utils/safeRoutes';
+import { safeRouteAPI } from '../utils/api';
 
 const FILTERS = [
   { label: 'All', icon: Shield },
   { label: 'Police', icon: ShieldAlert },
   { label: 'Hospital', icon: Hospital },
-  { label: 'Safe Zone', icon: Star }
+  { label: 'Public Place', icon: Star }
 ];
+
+const getLocalDateTime = () => {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+};
 
 export default function MapPage() {
   const { location, pois, isLoading: isLoadingGeo, error, refresh } = useLocation({ radius: 5000, maxEach: 6 });
   const [mapCenter, setMapCenter] = useState(null);
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showToast, setShowToast] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState(null);
+  const [destinationText, setDestinationText] = useState('');
+  const [destination, setDestination] = useState(null);
+  const [originText, setOriginText] = useState('');
+  const [originPoint, setOriginPoint] = useState(null);
+  const [cities, setCities] = useState([]);
+  const [cityId, setCityId] = useState('');
+  const [mode, setMode] = useState('walking');
+  const [departureTime, setDepartureTime] = useState(getLocalDateTime);
+  const [routeMetadata, setRouteMetadata] = useState(null);
+  const [routes, setRoutes] = useState([]);
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(null);
+  const [recommendedRouteIndex, setRecommendedRouteIndex] = useState(null);
+  const [isRouting, setIsRouting] = useState(false);
+  const [routeError, setRouteError] = useState('');
+  const [showCommunityAlert, setShowCommunityAlert] = useState(true);
+  const routeRequest = useRef(null);
+  const cityLookupStarted = useRef(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    safeRouteAPI.getCities(controller.signal)
+      .then((response) => {
+        if (!response.success || !Array.isArray(response.data)) {
+          throw new Error(response.message || 'Supported cities could not be loaded');
+        }
+        setCities(response.data);
+      })
+      .catch((requestError) => {
+        if (requestError.name !== 'AbortError') {
+          setRouteError(requestError.message || 'Supported cities could not be loaded');
+        }
+      });
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (isLoadingGeo || cityLookupStarted.current || !location) return;
+    cityLookupStarted.current = true;
+    const controller = new AbortController();
+    safeRouteAPI.locateCity(location[0], location[1], controller.signal)
+      .then((response) => {
+        if (response.success && response.data?.cityId) {
+          setCityId((currentCityId) => currentCityId || response.data.cityId);
+        }
+      })
+      .catch((requestError) => {
+        if (requestError.name !== 'AbortError') console.warn('Automatic city selection failed:', requestError);
+      });
+  }, [isLoadingGeo, location]);
 
   // Show toast when there's a location error
   const handleRefresh = () => {
@@ -44,8 +102,129 @@ export default function MapPage() {
     return matchesFilter && matchesSearch;
   });
 
+  const clearRoutes = () => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setRoutes([]);
+    setSelectedRouteIndex(null);
+    setRecommendedRouteIndex(null);
+    setRouteMetadata(null);
+    setRouteError('');
+    setIsRouting(false);
+  };
+
+  const displayRoutes = (analysis) => {
+    setRoutes(analysis.routes);
+    const bestIndex = Number.isInteger(analysis.recommendedRouteIndex)
+      ? analysis.recommendedRouteIndex
+      : null;
+    setRecommendedRouteIndex(bestIndex);
+    setSelectedRouteIndex(bestIndex ?? 0);
+    setRouteMetadata(analysis);
+  };
+
+  const handleDestinationSearch = async (event) => {
+    event.preventDefault();
+    if (!destinationText.trim()) {
+      setRouteError('Enter a destination to search.');
+      return;
+    }
+    if (!cityId) {
+      setRouteError('Select a supported city before requesting a route.');
+      return;
+    }
+    if (!Number.isFinite(new Date(departureTime).getTime())) {
+      setRouteError('Choose a valid departure date and time.');
+      return;
+    }
+
+    routeRequest.current?.abort();
+    const controller = new AbortController();
+    routeRequest.current = controller;
+    setIsRouting(true);
+    setRouteError('');
+    setRoutes([]);
+    setSelectedRouteIndex(null);
+    setRecommendedRouteIndex(null);
+    try {
+      const query = destinationText.trim();
+      const isSelectedDestination = destination && (
+        query === destination.name ||
+        query === `${destination.lat.toFixed(5)}, ${destination.lon.toFixed(5)}`
+      );
+      const result = isSelectedDestination
+        ? destination
+        : await geocodeDestination(query, controller.signal);
+      setDestination(result);
+      setDestinationText(result.name);
+      setMapCenter([result.lat, result.lon]);
+      setSelectedPlaceId(null);
+      let selectedOrigin = originPoint;
+      if (originText.trim() && (!selectedOrigin || originText.trim() !== selectedOrigin.name)) {
+        selectedOrigin = await geocodeDestination(originText.trim(), controller.signal);
+        setOriginPoint(selectedOrigin);
+        setOriginText(selectedOrigin.name);
+      }
+      const originCoordinates = selectedOrigin
+        ? [selectedOrigin.lat, selectedOrigin.lon]
+        : location;
+      const analysis = await getSafeRoutes(originCoordinates, result, controller.signal, {
+        cityId,
+        mode,
+        departureTime: new Date(departureTime).toISOString(),
+      });
+      displayRoutes(analysis);
+    } catch (requestError) {
+      if (requestError.name !== 'AbortError') {
+        console.error('Destination routing failed:', requestError);
+        setRouteError(requestError.message || 'Unable to find routes right now.');
+      }
+    } finally {
+      if (routeRequest.current === controller) {
+        routeRequest.current = null;
+        setIsRouting(false);
+      }
+    }
+  };
+
+  const selectDestination = (place) => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setDestination({ lat: place.lat, lon: place.lon, name: place.name });
+    setDestinationText(place.name);
+    setMapCenter([place.lat, place.lon]);
+    setSelectedPlaceId(place.id);
+    setRoutes([]);
+    setSelectedRouteIndex(null);
+    setRecommendedRouteIndex(null);
+    setRouteMetadata(null);
+    setRouteError('');
+    setIsRouting(false);
+  };
+
+  const handleMapDestination = (point) => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setDestination(point);
+    setDestinationText(`${point.lat.toFixed(5)}, ${point.lon.toFixed(5)}`);
+    setSelectedPlaceId(null);
+    setRoutes([]);
+    setSelectedRouteIndex(null);
+    setRecommendedRouteIndex(null);
+    setRouteMetadata(null);
+    setRouteError('');
+    setIsRouting(false);
+  };
+
+  const selectedRoute = selectedRouteIndex === null ? null : routes[selectedRouteIndex];
+  const selectedCity = cities.find((city) => city.cityId === cityId);
+  const routeFacilities = selectedRoute?.facilities || [];
+  const routeOrigin = originPoint
+    ? [originPoint.lat, originPoint.lon]
+    : location;
+
   return (
-    <div className="h-[calc(100vh-70px)] flex flex-col lg:flex-row overflow-hidden bg-white">
+    <div className="min-h-[calc(100dvh-136px)] flex flex-col bg-white lg:h-[calc(100dvh-72px)] lg:min-h-0 lg:flex-row lg:overflow-hidden">
 
       {/* Toast Notification for Default Location */}
       {error && (
@@ -56,8 +235,8 @@ export default function MapPage() {
       )}
 
       {/* Sidebar: Search & Places */}
-      <aside className="w-full lg:w-[400px] border-r border-gray-100 flex flex-col bg-white z-20 shadow-xl lg:shadow-none flex-shrink-0">
-        <div className="p-6 border-b border-gray-100 space-y-6">
+      <aside className="order-last w-full min-h-0 flex flex-col bg-white z-20 shadow-xl lg:order-first lg:h-full lg:w-[400px] lg:max-w-[40vw] lg:flex-shrink-0 lg:border-r lg:border-gray-100 lg:shadow-none">
+        <div className="p-4 lg:p-6 border-b border-gray-100 space-y-4 lg:space-y-6 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold font-serif text-[#2D1B2E]">Safety Explorer</h2>
             {/* Sidebar location button */}
@@ -70,18 +249,56 @@ export default function MapPage() {
             </button>
           </div>
 
+          <SafeRouteControls
+            cities={cities}
+            cityId={cityId}
+            selectedCity={selectedCity}
+            onCityChange={(value) => {
+              setCityId(value);
+              clearRoutes();
+            }}
+            originText={originText}
+            onOriginTextChange={setOriginText}
+            originPoint={originPoint}
+            onClearOrigin={() => {
+              setOriginPoint(null);
+              setOriginText('');
+            }}
+            destinationText={destinationText}
+            onDestinationTextChange={setDestinationText}
+            destination={destination}
+            onClearDestination={() => {
+              setDestination(null);
+              setDestinationText('');
+              clearRoutes();
+            }}
+            mode={mode}
+            onModeChange={(value) => {
+              setMode(value);
+              clearRoutes();
+            }}
+            departureTime={departureTime}
+            onDepartureTimeChange={(value) => {
+              setDepartureTime(value);
+              clearRoutes();
+            }}
+            onSubmit={handleDestinationSearch}
+            isRouting={isRouting}
+            isLoadingGeo={isLoadingGeo}
+          />
+
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search safe locations..."
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Filter nearby places..."
               className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:border-[#8B4A6A] transition-all outline-none text-sm font-medium text-[#2D1B2E]"
             />
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {FILTERS.map(f => (
               <button
                 key={f.label}
@@ -98,7 +315,18 @@ export default function MapPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="min-h-0 p-4 space-y-5 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:p-6 lg:space-y-6">
+          <SafeRouteAlternatives
+            routeError={routeError}
+            routes={routes}
+            selectedRouteIndex={selectedRouteIndex}
+            recommendedRouteIndex={recommendedRouteIndex}
+            onSelectRoute={setSelectedRouteIndex}
+            mode={mode}
+            cityName={selectedCity?.name}
+            routeMetadata={routeMetadata}
+          />
+
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-black uppercase tracking-widest text-[#6B5B6B]">Nearby Safe Locations</p>
             <Filter className="w-4 h-4 text-gray-400 cursor-pointer" />
@@ -142,9 +370,7 @@ export default function MapPage() {
                     <span className="flex items-center gap-1 text-[#6B5B6B] font-medium">
                       <Shield className="w-3 h-3" /> {place.type}
                     </span>
-                    <span className="flex items-center gap-1 text-green-600 font-bold">
-                      <Star className="w-3 h-3 fill-current" /> {place.rating}
-                    </span>
+                    <span className="text-[10px] text-gray-400">OpenStreetMap</span>
                   </div>
                   <div className="mt-4 flex items-center justify-between">
                     <p className="text-[10px] font-bold text-gray-400 italic">{place.status}</p>
@@ -159,15 +385,11 @@ export default function MapPage() {
                         className="p-2 bg-[#8B4A6A] rounded-lg text-white shadow-md hover:shadow-lg transition-all"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (place.googleMapsUrl) {
-                            window.open(place.googleMapsUrl, '_blank');
-                          } else {
-                            setMapCenter([place.lat, place.lon]);
-                          }
+                          selectDestination(place);
                         }}
-                        title={place.googleMapsUrl ? "Open in Google Maps" : "Go to location"}
+                        title="Set as route destination"
                       >
-                        <Navigation className="w-4 h-4" />
+                        <Route className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -177,25 +399,30 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Community Alert Strip */}
-        <div className="p-6 bg-[#2D1B2E] text-white">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-2 bg-white/10 rounded-lg">
-              <Shield className="w-5 h-5 text-[#C94A7D]" />
+        {showCommunityAlert && (
+          <div className="relative flex-shrink-0 border-t border-gray-100 bg-[#2D1B2E] px-4 py-2.5 pr-11 text-white lg:px-5">
+            <div className="flex items-center gap-2.5">
+              <Shield className="h-4 w-4 flex-shrink-0 text-[#C94A7D]" />
+              <p className="min-w-0 text-[11px] leading-snug">
+                <span className="mr-1.5 font-bold uppercase tracking-wider text-[#C94A7D]">Community alert</span>
+                <span className="opacity-80">OSM map data does not verify an area as safe.</span>
+              </p>
             </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#C94A7D]">Community Alert</p>
-              <p className="text-xs font-body opacity-80">Connaught Place area verified safe by 42 users today.</p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowCommunityAlert(false)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Dismiss community alert"
+              title="Dismiss alert"
+            >
+              <XCircle className="h-4 w-4" />
+            </button>
           </div>
-          <button className="w-full py-3 bg-[#8B4A6A] rounded-xl font-bold text-sm hover:bg-[#C94A7D] transition-all">
-            Report Safety Concern
-          </button>
-        </div>
+        )}
       </aside>
 
       {/* Main Content: Map */}
-      <main className="flex-1 relative bg-gray-50 flex items-center justify-center">
+      <main className="relative order-first h-[40dvh] min-h-[240px] max-h-[380px] w-full flex-none bg-gray-50 flex items-center justify-center lg:order-last lg:h-auto lg:max-h-none lg:min-h-0 lg:min-w-0 lg:flex-1">
 
         {/* Loading State or Map */}
         {isLoadingGeo ? (
@@ -205,7 +432,18 @@ export default function MapPage() {
           </div>
         ) : (
           <div className="absolute inset-0 z-0">
-            <CustomMapContainer location={center} pois={filteredPois} />
+            <CustomMapContainer
+              location={center}
+              origin={originPoint ? routeOrigin : null}
+              originName={originPoint?.name || 'Route start'}
+              pois={filteredPois}
+              routes={routes}
+              selectedRouteIndex={selectedRouteIndex}
+              destination={destination}
+              routeFacilities={routeFacilities}
+              onSelectRoute={setSelectedRouteIndex}
+              onSelectDestination={handleMapDestination}
+            />
           </div>
         )}
 

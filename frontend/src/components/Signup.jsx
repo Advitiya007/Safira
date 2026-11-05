@@ -4,6 +4,7 @@ import SignupStep1 from './SignupStep1';
 import SignupStep2 from './SignupStep2';
 import ProgressBar from './ProgressBar';
 import { authAPI } from '../utils/api';
+import { connectSocket } from '../utils/socket';
 import './Signup.css';
 
 const Signup = () => {
@@ -95,6 +96,7 @@ const Signup = () => {
         
         if (data.success) {
           localStorage.setItem('authToken', data.data.token);
+          connectSocket();
           navigate('/dashboard');
         } else {
           setErrors({ submit: data.message });
@@ -123,6 +125,7 @@ const Signup = () => {
       
       if (data.success) {
         localStorage.setItem('authToken', data.data.token);
+        connectSocket();
         navigate('/dashboard');
       } else {
         setErrors({ submit: data.message });
@@ -148,7 +151,7 @@ const Signup = () => {
         </div>
         <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 h-full">
           {/* Logo */}
-          <div className="text-3xl font-bold font-serif text-white mb-2">SafeHer India</div>
+          <div className="text-3xl font-bold font-serif text-white mb-2">Safira</div>
           <div className="text-xs tracking-widest text-gray-300 mb-12">YOUR SAFETY. OUR PRIORITY</div>
           
           {/* Heading */}

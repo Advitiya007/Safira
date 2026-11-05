@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -20,8 +20,6 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: [true, 'Phone number is required'],
-        trim: true,
-        match: [/^\d{10}$/, 'Phone number must be exactly 10 digits']
     },
     password: {
         type: String,
@@ -33,7 +31,10 @@ const userSchema = new mongoose.Schema({
     },
     emergencyContactPhone: {
         type: String,
-        trim: true
+    },
+    contactEncryptionVersion: {
+        type: Number,
+        default: 0,
     },
     isActive: {
         type: Boolean,
@@ -47,6 +48,8 @@ const userSchema = new mongoose.Schema({
         type: Date
     }
 }, { timestamps: true });
+
+userSchema.index({ contactEncryptionVersion: 1 });
 
 // Pre-save middleware to hash password if modified
 userSchema.pre('save', async function (next) {
@@ -72,4 +75,4 @@ userSchema.set('toJSON', {
 });
 
 const User = mongoose.model('User', userSchema);
-module.exports = User;
+export default User;

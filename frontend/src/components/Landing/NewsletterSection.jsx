@@ -30,7 +30,7 @@ export default function NewsletterSection() {
           <div className="bg-green-50 border border-green-200 rounded-xl py-5 px-6 mb-6">
             <p className="font-label text-sm text-green-700 font-semibold flex items-center justify-center gap-2">
               <span className="material-symbols-outlined text-lg">check_circle</span>
-              You're subscribed! Welcome to the SafeHer community.
+              You're subscribed! Welcome to the Safira community.
             </p>
           </div>
         ) : (

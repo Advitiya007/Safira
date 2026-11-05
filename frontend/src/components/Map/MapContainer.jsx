@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer as LeafletMap, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer as LeafletMap, TileLayer, Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -22,6 +22,18 @@ const createIcon = (type) => {
         bgColor = 'bg-red-100 border-red-200';
         iconName = 'local_hospital';
         colorClass = 'text-[#DC2626]';
+    } else if (t === 'pharmacy') {
+        bgColor = 'bg-green-100 border-green-200';
+        iconName = 'medical_services';
+        colorClass = 'text-[#15803D]';
+    } else if (t === 'public transport') {
+        bgColor = 'bg-sky-100 border-sky-200';
+        iconName = 'train';
+        colorClass = 'text-[#0369A1]';
+    } else if (t === 'mapped establishment') {
+        bgColor = 'bg-amber-100 border-amber-200';
+        iconName = 'storefront';
+        colorClass = 'text-[#B45309]';
     } else {
         // Safezone / Crowd
         bgColor = 'bg-[#8B4A6A]/10 border-[#8B4A6A]/20';
@@ -62,24 +74,69 @@ function MapZoomController({ center }) {
     return null;
 }
 
-export default function CustomMapContainer({ location, pois }) {
+function MapDestinationPicker({ onSelectDestination }) {
+    useMapEvents({
+        click(event) {
+            if (onSelectDestination) {
+                onSelectDestination({ lat: event.latlng.lat, lon: event.latlng.lng });
+            }
+        },
+    });
+    return null;
+}
+
+function RouteViewport({ route }) {
+    const map = useMap();
+    useEffect(() => {
+        if (route?.coordinates?.length > 1) {
+            map.fitBounds(route.coordinates, { padding: [40, 40], maxZoom: 15 });
+        }
+    }, [map, route]);
+    return null;
+}
+
+export default function CustomMapContainer({
+    location,
+    origin = null,
+    originName = 'Route start',
+    pois,
+    routes = [],
+    selectedRouteIndex = null,
+    destination = null,
+    routeFacilities = [],
+    onSelectRoute,
+    onSelectDestination,
+}) {
+    const selectedRoute = selectedRouteIndex === null ? null : routes[selectedRouteIndex];
+    const visiblePois = [...new Map(
+        [...pois, ...routeFacilities].map((poi) => [`${poi.id}:${poi.lat}:${poi.lon}`, poi]),
+    ).values()];
+
     return (
         <>
             <style>{customMarkerStyle}</style>
             <div className="absolute inset-0 z-0">
                 <LeafletMap center={location} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={true}>
                     <MapZoomController center={location} />
+                    <MapDestinationPicker onSelectDestination={onSelectDestination} />
+                    <RouteViewport route={selectedRoute} />
                     <TileLayer
-                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; OpenStreetMap contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     />
 
-                    <Marker position={location} icon={userIcon}>
+                    <Marker position={location} icon={userIcon} bubblingMouseEvents={false}>
                         <Popup className="font-body shadow-sm text-center font-bold">You are here</Popup>
                     </Marker>
 
-                    {pois.map(poi => (
-                        <Marker key={poi.id} position={[poi.lat, poi.lon]} icon={createIcon(poi.type)}>
+                    {origin && (
+                        <Marker position={origin} bubblingMouseEvents={false}>
+                            <Popup>{originName}</Popup>
+                        </Marker>
+                    )}
+
+                    {visiblePois.map(poi => (
+                        <Marker key={poi.id} position={[poi.lat, poi.lon]} icon={createIcon(poi.type)} bubblingMouseEvents={false}>
                             <Popup className="font-body shadow-sm border-none rounded-xl">
                                 <div className="text-center p-1">
                                     <h4 className="font-serif font-bold text-on-surface text-[14px] mb-1">{poi.name}</h4>
@@ -88,6 +145,26 @@ export default function CustomMapContainer({ location, pois }) {
                             </Popup>
                         </Marker>
                     ))}
+
+                    {routes.map((route, index) => (
+                        <Polyline
+                            key={`route-${route.id}`}
+                            positions={route.coordinates}
+                            bubblingMouseEvents={false}
+                            pathOptions={{
+                                color: index === selectedRouteIndex ? '#8B4A6A' : '#687585',
+                                weight: index === selectedRouteIndex ? 7 : 4,
+                                opacity: index === selectedRouteIndex ? 0.95 : 0.6,
+                            }}
+                            eventHandlers={{ click: () => onSelectRoute?.(index) }}
+                        />
+                    ))}
+
+                    {destination && (
+                        <Marker position={[destination.lat, destination.lon]} bubblingMouseEvents={false}>
+                            <Popup>{destination.name || 'Selected destination'}</Popup>
+                        </Marker>
+                    )}
                 </LeafletMap>
             </div>
         </>

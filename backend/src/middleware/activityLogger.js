@@ -1,4 +1,4 @@
-const { logActivity } = require('../controllers/activityController');
+import { logActivity } from '../controllers/activityController.js';
 
 const logUserActivity = async (req, res, next) => {
     try {
@@ -28,4 +28,4 @@ const logUserActivity = async (req, res, next) => {
     next();
 };
 
-module.exports = logUserActivity;
+export default logUserActivity;

@@ -214,14 +214,14 @@ export default function SettingsPage() {
                         {/* About Tab */}
                         {activeTab === 'about' && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                <h2 className="text-2xl font-bold font-serif text-[#2D1B2E] mb-6">About SafeHer India</h2>
+                                <h2 className="text-2xl font-bold font-serif text-[#2D1B2E] mb-6">About Safira</h2>
                                 <div className="bg-[#FDF0F6] rounded-2xl p-6 border border-[#8B4A6A]/10">
                                     <div className="flex items-center gap-3 mb-4">
                                         <Shield className="w-8 h-8 text-[#8B4A6A]" />
-                                        <h3 className="text-xl font-bold font-serif text-[#8B4A6A]">SafeHer India</h3>
+                                        <h3 className="text-xl font-bold font-serif text-[#8B4A6A]">Safira</h3>
                                     </div>
                                     <p className="text-[#6B5B6B] leading-relaxed mb-6">
-                                        SafeHer India is a comprehensive women's safety platform designed to provide real-time protection, community support, and rapid emergency assistance across the country.
+                                        Safira is a women's safety and wellness platform designed to support informed choices, community connections, and emergency assistance.
                                     </p>
                                     <div className="space-y-3 text-sm font-medium">
                                         <div className="flex justify-between py-2 border-b border-white/50">
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                                         </div>
                                         <div className="flex justify-between py-2 border-b border-white/50">
                                             <span className="text-[#6B5B6B]">Built By</span>
-                                            <span className="text-[#2D1B2E] font-bold">SafeHer Team</span>
+                                            <span className="text-[#2D1B2E] font-bold">Safira Team</span>
                                         </div>
                                         <div className="flex justify-between py-2 border-b border-white/50">
                                             <span className="text-[#6B5B6B]">Privacy Policy</span>

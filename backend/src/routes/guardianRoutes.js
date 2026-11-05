@@ -1,6 +1,6 @@
-const express = require('express');
-const { addGuardian, getGuardians, removeGuardian, updateGuardian } = require('../controllers/guardianController');
-const { verifyToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { addGuardian, getGuardians, removeGuardian, updateGuardian } from '../controllers/guardianController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.route('/:id')
     .delete(removeGuardian)
     .put(updateGuardian);
 
-module.exports = router;
+export default router;

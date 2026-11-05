@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const guardianSchema = new mongoose.Schema({
     userId: {
@@ -16,8 +16,15 @@ const guardianSchema = new mongoose.Schema({
     guardianPhone: {
         type: String,
         required: [true, 'Guardian phone is required'],
-        trim: true,
-        match: [/^\d{10}$/, 'Phone number must be exactly 10 digits']
+    },
+    guardianPhoneHash: {
+        type: String,
+        select: false,
+    },
+    contactEncryptionVersion: {
+        type: Number,
+        default: 0,
+        select: false,
     },
     relationship: {
         type: String,
@@ -45,6 +52,8 @@ const guardianSchema = new mongoose.Schema({
 // Index for efficient queries
 guardianSchema.index({ userId: 1 });
 guardianSchema.index({ status: 1 });
+guardianSchema.index({ userId: 1, guardianPhoneHash: 1 });
+guardianSchema.index({ contactEncryptionVersion: 1 });
 
 const Guardian = mongoose.model('Guardian', guardianSchema);
-module.exports = Guardian;
+export default Guardian;

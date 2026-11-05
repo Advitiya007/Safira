@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
     Map as MapIcon,
     AlertTriangle,
@@ -12,22 +12,23 @@ import {
     User,
     Settings,
     LogOut,
-    ShieldCheck as Shield
+    ShieldCheck as Shield,
+    Palette
 } from 'lucide-react';
 import { ROUTES } from '../../utils/constants';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { isAuthenticated, logout } = useAuth();
-    const location = useLocation();
-
+    const { theme, setTheme, themes } = useTheme();
     const navLinks = [
         { name: 'Dashboard', path: ROUTES.DASHBOARD, icon: LayoutDashboard },
         { name: 'Safety Map', path: ROUTES.MAP, icon: MapIcon },
         { name: 'SOS Emergency', path: ROUTES.SOS, icon: AlertTriangle },
         { name: 'Guardian Network', path: ROUTES.GUARDIANS, icon: Users },
-        { name: 'Wellness Guides', path: ROUTES.WELLNESS, icon: Leaf },
+        { name: 'Wellness', path: ROUTES.WELLNESS, icon: Leaf },
         { name: 'Current Affairs', path: ROUTES.NEWS, icon: Newspaper },
     ];
 
@@ -39,13 +40,13 @@ export default function Navbar() {
                     <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex flex-col">
-                    <span className="font-headline font-bold text-xl text-primary tracking-tight leading-none uppercase italic">SafeHer India</span>
-                    <span className="text-[10px] text-primary/60 font-label font-bold tracking-[0.2em] uppercase">Guardian Network</span>
+                    <span className="font-headline font-bold text-xl text-primary tracking-tight leading-none uppercase italic">Safira</span>
+                    <span className="text-[10px] text-primary/60 font-label font-bold tracking-[0.16em] uppercase">Her journey, her choice</span>
                 </div>
             </Link>
 
             {/* Center: Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden xl:flex items-center gap-4">
                 {navLinks.map((link) => (
                     <NavLink
                         key={link.path}
@@ -64,7 +65,23 @@ export default function Navbar() {
             </div>
 
             {/* Right: Actions */}
-            <div className="hidden lg:flex items-center gap-6">
+            <div className="hidden xl:flex items-center gap-6">
+                <label className="flex items-center gap-2 text-xs font-bold text-on-surface/70">
+                    <Palette className="h-4 w-4 text-primary" />
+                    <span className="sr-only">Color theme</span>
+                    <select
+                        aria-label="Color theme"
+                        value={theme}
+                        onChange={(event) => setTheme(event.target.value)}
+                        className="rounded-lg border border-outline-variant bg-white px-2 py-2 text-xs font-bold text-on-surface"
+                    >
+                        {themes.map((option) => (
+                            <option key={option} value={option}>
+                                {option[0].toUpperCase() + option.slice(1)}
+                            </option>
+                        ))}
+                    </select>
+                </label>
                 {isAuthenticated ? (
                     <>
                         <Link to={ROUTES.SETTINGS} className="p-2 text-on-surface/60 hover:text-primary transition-colors">
@@ -89,7 +106,7 @@ export default function Navbar() {
 
             {/* Mobile Toggle */}
             <button
-                className="lg:hidden p-2 text-primary"
+                className="xl:hidden p-2 text-primary"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -97,8 +114,26 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant/30 lg:hidden shadow-2xl animate-in slide-in-from-top-4 p-6">
+                <div className="absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant/30 xl:hidden shadow-2xl animate-in slide-in-from-top-4 p-6">
                     <div className="flex flex-col gap-2">
+                        <label className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm font-bold text-on-surface">
+                            <span className="inline-flex items-center gap-2">
+                                <Palette className="h-4 w-4 text-primary" />
+                                Color theme
+                            </span>
+                            <select
+                                aria-label="Color theme"
+                                value={theme}
+                                onChange={(event) => setTheme(event.target.value)}
+                                className="rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm text-on-surface"
+                            >
+                                {themes.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option[0].toUpperCase() + option.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
                         {navLinks.map((link) => (
                             <NavLink
                                 key={link.path}

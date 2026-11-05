@@ -1,6 +1,6 @@
-const express = require('express');
-const { registerUser, loginUser, logoutUser, getCurrentUser, refreshToken } = require('../controllers/authController');
-const { verifyToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { registerUser, loginUser, logoutUser, getCurrentUser, refreshToken } from '../controllers/authController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -10,4 +10,4 @@ router.post('/logout', verifyToken, logoutUser);
 router.get('/me', verifyToken, getCurrentUser);
 router.get('/refresh', verifyToken, refreshToken);
 
-module.exports = router;
+export default router;

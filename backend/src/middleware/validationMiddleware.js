@@ -34,7 +34,7 @@ const validateCoordinates = (lat, lng) => {
     return true;
 };
 
-module.exports = {
+export {
     validateEmail,
     validatePhone,
     validatePassword,

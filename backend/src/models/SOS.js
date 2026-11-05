@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sosSchema = new mongoose.Schema({
     userId: {
@@ -36,4 +36,4 @@ const sosSchema = new mongoose.Schema({
 });
 
 const SOS = mongoose.model('SOS', sosSchema);
-module.exports = SOS;
+export default SOS;

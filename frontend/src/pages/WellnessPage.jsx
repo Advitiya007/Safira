@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Filter, Clock, ArrowRight, Bookmark, Share2, CheckCircle, Heart, Sparkles, Shield, Compass, Dumbbell, Brain } from 'lucide-react';
+import { WELLNESS_GUIDES } from '../data/wellnessGuides';
 export default function WellnessPage() {
     const [activeCategory, setActiveCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
@@ -14,63 +15,7 @@ export default function WellnessPage() {
         { name: 'Travel Tips', icon: Compass },
         { name: 'Self Defense', icon: Dumbbell }
     ];
-    const GUIDES = [
-        {
-            id: 1,
-            title: 'Active Awareness: Daily Safety Habits',
-            category: 'Physical Safety',
-            desc: 'Simple routines you can incorporate into your daily life to stay alert and prepared for any situation.',
-            time: '5 min read',
-            image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=400',
-            accent: '#E67E22'
-        },
-        {
-            id: 2,
-            title: 'Healing Through Community',
-            category: 'Mental Health',
-            desc: 'Understanding the power of safe spaces and sisterhood in overcoming anxiety and trauma.',
-            time: '8 min read',
-            image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=400',
-            accent: '#2ECC71'
-        },
-        {
-            id: 3,
-            title: 'Safe Solo Travel in India',
-            category: 'Travel Tips',
-            desc: 'A comprehensive guide to navigating public transport, accommodation, and late-night travel safely.',
-            time: '12 min read',
-            image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=400',
-            accent: '#3498DB'
-        },
-        {
-            id: 4,
-            title: 'Basics of De-escalation',
-            category: 'Self Defense',
-            desc: 'How to use verbal techniques and body language to defuse potentially dangerous confrontations.',
-            time: '6 min read',
-            image: 'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?auto=format&fit=crop&q=80&w=400',
-            accent: '#9B59B6'
-        },
-        {
-            id: 5,
-            title: 'The "Invisible Shield" Technique',
-            category: 'Self Defense',
-            desc: 'Psychological strategies to project confidence and deter unwanted attention in crowded spaces.',
-            time: '7 min read',
-            image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=400',
-            accent: '#E74C3C'
-        },
-        {
-            id: 6,
-            title: 'Managing Panic in Crisis',
-            category: 'Mental Health',
-            desc: 'Quick breathing exercises and grounding techniques used by first responders to stay calm.',
-            time: '4 min read',
-            image: 'https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&q=80&w=400',
-            accent: '#1ABC9C'
-        }
-    ];
-    const filteredGuides = GUIDES.filter(g => {
+    const filteredGuides = WELLNESS_GUIDES.filter(g => {
         const matchesCategory = activeCategory === 'All' || g.category === activeCategory;
         const matchesSearch = g.title.toLowerCase().includes(searchQuery.toLowerCase())
             || g.desc.toLowerCase().includes(searchQuery.toLowerCase());
@@ -116,9 +61,9 @@ export default function WellnessPage() {
             <div className="max-w-7xl mx-auto px-8 py-12 relative z-10">
                 {/* Hero Header */}
                 <header className="mb-16 text-center max-w-3xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'linear-gradient(135deg, #FDF2F8, #EDE9FE)', border: '1px solid rgba(139,74,106,0.15)' }}>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, white)', border: '1px solid color-mix(in srgb, var(--color-primary) 18%, transparent)' }}>
                         <Heart className="w-4 h-4 text-[#C94A7D]" />
-                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#8B4A6A]">Your Wellness Hub</span>
+                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#8B4A6A]">Safira Wellness</span>
                         {savedGuides.length > 0 && (
                             <span className="bg-[#C94A7D] text-white px-2 py-0.5 rounded-full text-[10px] font-bold ml-1">
                                 {savedGuides.length} saved
@@ -126,11 +71,11 @@ export default function WellnessPage() {
                         )}
                     </div>
                     <h1 className="text-5xl md:text-6xl font-bold font-serif text-[#2D1B2E] tracking-tight leading-[1.1] mb-6">
-                        Wellness & Safety<br />
-                        <span style={{ background: 'linear-gradient(135deg, #8B4A6A, #C94A7D, #A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Guides</span>
+                        Her Journey,<br />
+                        <span style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container), var(--color-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Her Choice</span>
                     </h1>
                     <p className="text-lg text-[#6B5B6B] font-body max-w-xl mx-auto leading-relaxed">
-                        Expert-vetted resources for your physical safety and mental well-being. Curated with care for women across India.
+                        Wellness and safety resources to support your choices, your well-being, and every step of your journey.
                     </p>
                     {/* Search */}
                     <div className="relative w-full max-w-md mx-auto mt-8">
@@ -154,7 +99,7 @@ export default function WellnessPage() {
                     />
                     <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(45,27,46,0.92) 0%, rgba(45,27,46,0.7) 40%, rgba(45,27,46,0.3) 100%)' }} />
                     <div className="relative z-10 p-12 md:p-16 flex flex-col justify-end h-full" style={{ minHeight: '420px' }}>
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.15em] w-fit mb-6" style={{ background: 'linear-gradient(135deg, #C94A7D, #A855F7)', color: 'white' }}>
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-[0.15em] w-fit mb-6" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: 'white' }}>
                             <Sparkles className="w-3.5 h-3.5" /> Featured Guide
                         </span>
                         <h2 className="text-4xl md:text-5xl font-serif font-bold text-white leading-tight mb-4 max-w-2xl">
@@ -173,14 +118,14 @@ export default function WellnessPage() {
                                     Public transit poses different challenges. Stick to well-lit compartments and sit near the exit or transit staff. If you feel uneasy, trust your gut. Move to another carriage or get off at the next populated stop.
                                 </p>
                                 <p className="text-gray-300 font-body text-sm leading-relaxed">
-                                    Finally, always share your live location with at least one trusted Guardian. SafeHer India's background tracking ensures your safety network always knows your last known location, even if your phone loses signal.
+                                    Finally, share your live location with a trusted contact when you choose. Safira's live tracking can share location updates while the feature is active and connected.
                                 </p>
                             </div>
                         </div>
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
                             className="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl font-bold text-sm uppercase tracking-widest w-fit transition-all duration-300 group/btn"
-                            style={{ background: 'linear-gradient(135deg, #C94A7D, #A855F7)', color: 'white', boxShadow: '0 8px 32px rgba(201,74,125,0.35)' }}
+                            style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: 'white', boxShadow: '0 8px 32px color-mix(in srgb, var(--color-primary) 35%, transparent)' }}
                         >
                             {isExpanded ? 'Collapse Article' : 'Read Full Article'}
                             <ArrowRight className={`w-4 h-4 transition-transform duration-500 ${isExpanded ? 'rotate-90' : 'group-hover/btn:translate-x-1'}`} />
@@ -199,12 +144,12 @@ export default function WellnessPage() {
                                         ? 'text-white shadow-lg scale-105'
                                         : 'bg-white/70 backdrop-blur-sm border border-gray-200/60 text-[#6B5B6B] hover:border-[#C94A7D]/40 hover:bg-white'
                                     }`}
-                                style={activeCategory === cat.name ? { background: 'linear-gradient(135deg, #8B4A6A, #C94A7D)', boxShadow: '0 8px 24px rgba(201,74,125,0.3)' } : {}}
+                                style={activeCategory === cat.name ? { background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-primary) 30%, transparent)' } : {}}
                             >
                                 <Icon className="w-4 h-4" />
                                 {cat.name}
                                 <span className={`text-xs ${activeCategory === cat.name ? 'text-white/70' : 'text-gray-400'}`}>
-                                    ({cat.name === 'All' ? GUIDES.length : GUIDES.filter(g => g.category === cat.name).length})
+                                    ({cat.name === 'All' ? WELLNESS_GUIDES.length : WELLNESS_GUIDES.filter(g => g.category === cat.name).length})
                                 </span>
                             </button>);
                     })}               </div>
@@ -272,7 +217,7 @@ export default function WellnessPage() {
                                                 onClick={() => toggleBookmark(guide.id)}
                                                 className={`p-2 rounded-xl transition-all ${savedGuides.includes(guide.id) ? 'bg-[#FDF0F6] text-[#C94A7D] scale-110' : 'text-gray-400 hover:text-[#C94A7D] hover:bg-gray-50'}`}
                                             >
-                                                <Bookmark className="w-4 h-4" fill={savedGuides.includes(guide.id) ? '#C94A7D' : 'none'} />
+                                                <Bookmark className="w-4 h-4" fill={savedGuides.includes(guide.id) ? 'var(--color-primary)' : 'none'} />
                                             </button>
                                             <button
                                                 onClick={() => handleShare(guide)}
@@ -289,11 +234,11 @@ export default function WellnessPage() {
                 )}
                 {/* Bottom CTA */}
                 <div className="mt-20 text-center">
-                    <div className="inline-flex flex-col items-center gap-4 p-10 rounded-[2rem]" style={{ background: 'linear-gradient(135deg, rgba(139,74,106,0.06), rgba(168,85,247,0.06))', border: '1px solid rgba(139,74,106,0.1)' }}>
+                    <div className="inline-flex flex-col items-center gap-4 p-10 rounded-[2rem]" style={{ background: 'color-mix(in srgb, var(--color-primary) 6%, white)', border: '1px solid color-mix(in srgb, var(--color-primary) 10%, transparent)' }}>
                         <Shield className="w-8 h-8 text-[#8B4A6A]" />
                         <h3 className="text-2xl font-serif font-bold text-[#2D1B2E]">Want to contribute a guide?</h3>
                         <p className="text-[#6B5B6B] max-w-md text-sm">Share your safety tips and wellness advice to help women across India stay informed and empowered.</p>
-                        <button className="mt-2 px-8 py-3 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #8B4A6A, #C94A7D)', boxShadow: '0 8px 24px rgba(201,74,125,0.3)' }}>
+                        <button className="mt-2 px-8 py-3 rounded-xl text-white font-bold text-sm uppercase tracking-widest transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-container))', boxShadow: '0 8px 24px color-mix(in srgb, var(--color-primary) 30%, transparent)' }}>
                             Submit a Guide
                         </button>
                     </div>

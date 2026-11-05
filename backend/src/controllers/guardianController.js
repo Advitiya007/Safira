@@ -1,4 +1,13 @@
-const Guardian = require('../models/Guardian');
+import Guardian from '../models/Guardian.js';
+import { decryptContact, encryptContact, hashContact } from '../services/contactEncryptionService.js';
+
+const serializeGuardian = (guardian) => {
+    const data = guardian.toObject ? guardian.toObject() : { ...guardian };
+    data.guardianPhone = decryptContact(data.guardianPhone);
+    delete data.guardianPhoneHash;
+    delete data.contactEncryptionVersion;
+    return data;
+};
 
 const addGuardian = async (req, res, next) => {
     try {
@@ -39,10 +48,11 @@ const addGuardian = async (req, res, next) => {
         }
 
         // Check if guardian already exists for this user
-        const existingGuardian = await Guardian.findOne({ 
-            userId: req.user.userId, 
-            guardianPhone 
-        });
+        const guardianPhoneHash = hashContact(guardianPhone);
+        const existingGuardian = await Guardian.findOne({
+            userId: req.user.userId,
+            guardianPhoneHash,
+        }).select('+guardianPhoneHash');
         
         if (existingGuardian) {
             return res.status(400).json({
@@ -55,7 +65,9 @@ const addGuardian = async (req, res, next) => {
         const guardian = await Guardian.create({
             userId: req.user.userId,
             guardianName,
-            guardianPhone,
+            guardianPhone: encryptContact(guardianPhone),
+            guardianPhoneHash,
+            contactEncryptionVersion: 1,
             relationship,
             status: 'active',
             addedAt: Date.now(),
@@ -65,7 +77,7 @@ const addGuardian = async (req, res, next) => {
         res.status(201).json({ 
             success: true, 
             message: 'Guardian added successfully', 
-            data: guardian 
+            data: serializeGuardian(guardian)
         });
     } catch (err) {
         next(err);
@@ -78,7 +90,7 @@ const getGuardians = async (req, res, next) => {
         res.status(200).json({ 
             success: true, 
             message: 'Guardians retrieved successfully', 
-            data: guardians 
+            data: guardians.map(serializeGuardian)
         });
     } catch (err) {
         next(err);
@@ -143,7 +155,20 @@ const updateGuardian = async (req, res, next) => {
                     message: 'Phone number must be exactly 10 digits'
                 });
             }
-            guardian.guardianPhone = guardianPhone;
+            const guardianPhoneHash = hashContact(guardianPhone);
+            const duplicate = await Guardian.findOne({
+                _id: { $ne: guardian._id },
+                userId: req.user.userId,
+                guardianPhoneHash,
+            }).select('+guardianPhoneHash');
+            if (duplicate) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Guardian already added'
+                });
+            }
+            guardian.guardianPhone = encryptContact(guardianPhone);
+            guardian.guardianPhoneHash = guardianPhoneHash;
         }
 
         if (relationship) {
@@ -154,6 +179,7 @@ const updateGuardian = async (req, res, next) => {
                     message: 'Invalid relationship type'
                 });
             }
+            guardian.contactEncryptionVersion = 1;
             guardian.relationship = relationship;
         }
 
@@ -162,11 +188,11 @@ const updateGuardian = async (req, res, next) => {
         res.status(200).json({ 
             success: true, 
             message: 'Guardian updated successfully', 
-            data: guardian 
+            data: serializeGuardian(guardian)
         });
     } catch (err) {
         next(err);
     }
 };
 
-module.exports = { addGuardian, getGuardians, removeGuardian, updateGuardian };
+export { addGuardian, getGuardians, removeGuardian, updateGuardian };

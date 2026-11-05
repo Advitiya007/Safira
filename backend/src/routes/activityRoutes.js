@@ -1,10 +1,10 @@
-const express = require('express');
-const { getActivityLog } = require('../controllers/activityController');
-const { verifyToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { getActivityLog } from '../controllers/activityController.js';
+import { verifyToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.use(verifyToken);
 router.get('/', getActivityLog);
 
-module.exports = router;
+export default router;

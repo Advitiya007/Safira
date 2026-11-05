@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const FAQ_DATA = [
-    { q: 'Is SafeHer really free?', a: 'Yes! The core SOS and live location features are always free to ensure every woman has access to safety.' },
+    { q: 'Is Safira really free?', a: 'Yes! The core SOS and live location features are always free to ensure every woman has access to safety.' },
     { q: 'How does the Guardian Network work in Premium?', a: 'Premium matches you with background-checked local volunteers within a 5km radius to assist in emergencies.' }
 ];
 

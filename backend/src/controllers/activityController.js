@@ -1,4 +1,4 @@
-const Activity = require('../models/Activity');
+import Activity from '../models/Activity.js';
 
 // Internal function to log activity silently
 const logActivity = async (userId, action, details, status = 'success') => {
@@ -24,4 +24,4 @@ const getActivityLog = async (req, res, next) => {
     }
 };
 
-module.exports = { logActivity, getActivityLog };
+export { logActivity, getActivityLog };
