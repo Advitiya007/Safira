@@ -1,0 +1,38 @@
+{
+  "name": "safeher-india-backend",
+  "version": "1.0.0",
+  "description": "SafeHer India Backend API - Women Safety Platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test",
+    "import:osm": "node src/scripts/importOsmCityData.js",
+    "import:boundary": "node src/scripts/importCityBoundary.js",
+    "encrypt:contacts": "node src/scripts/encryptStoredContactNumbers.js"
+  },
+  "keywords": [
+    "safeher",
+    "women",
+    "safety",
+    "india"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^7.8.9",
+    "opening_hours": "^3.15.0",
+    "polygon-clipping": "^0.15.7",
+    "@turf/boolean-valid": "^7.4.0",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "type": "module"
+}
