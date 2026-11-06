@@ -1,4 +1,4 @@
-# 🛡️ Safira
+# Safira
 
 <div align="center">
 
@@ -153,12 +153,18 @@ Safira  uses a curated color palette designed to evoke a sense of **peace, trust
 
 
 ---
+📜 License
 
+Copyright © 2026 Advitiya007. All Rights Reserved.
+Safira is a proprietary project. This repository is publicly accessible for viewing, portfolio evaluation, and recruitment assessment only.
+Copying, modifying, redistributing, or reusing this project's code or materials without prior written permission is prohibited.
+See the LICENSE file for the complete terms.
 <div align="center">
 
-### 🛡️ Safira 
+###  Safira 
 **"Your Safety. Our Priority."**
 
 *Made for the women of , by someone who cares.*
 
 </div>
+
