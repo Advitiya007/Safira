@@ -2,17 +2,11 @@
 
 <div align="center">
 
-![SafeHer India Banner](https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=1200)
+
 
 ### **"Empowering Every Journey. Your Safety, Our Priority."**
 
-*A women-first safety ecosystem designed for solo female travelers in India. Featuring real-time safety mapping, SOS emergency signals, and a trusted circle of protection.*
-
-**[Figma Design Link](https://www.figma.com/design/GLHpttqi7FTGCXr6KpmHkg/safeHer_India?node-id=3100-2&t=DX4JZgdvf9MG152g-1)**  
-**[Live Frontend Link](https://safeher-india.netlify.app)**  
-**[Backend API Link](https://safeher-indiasafeher-india-backend.onrender.com)**  
-**[Postman Documentation](https://documenter.getpostman.com/view/50839212/2sBXqKoL4C)**  
-**[YouTube Demo Link](https://youtu.be/HZP9aMgso-c)**  
+*A women-first safety ecosystem designed for solo female travelers in . Featuring real-time safety mapping, SOS emergency signals, and a trusted circle of protection.* 
 
 
 </div>
@@ -21,7 +15,7 @@
 
 ## 📖 Overview
 
-SafeHer India is more than just an app; it's a digital guardian. Built to address the unique safety challenges faced by women in urban and rural India, it provides a comprehensive suite of tools ranging from immediate emergency response to proactive wellness and safety education.
+Safira  is more than just an app; it's a digital guardian. Built to address the unique safety challenges faced by women in urban and rural , it provides a comprehensive suite of tools ranging from immediate emergency response to proactive wellness and safety education.
 
 ### 🆘 Why Safira?
 - **Unsafe Environments**: Real-time identification of safe zones.
@@ -60,7 +54,7 @@ SafeHer India is more than just an app; it's a digital guardian. Built to addres
 
 ### Frontend Architecture
 - **Framework**: [React 19](https://reactjs.org/) (Vite for lighting fast builds)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) with a custom **"Indian Wellness Aesthetic"**
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) with a custom **"n Wellness Aesthetic"**
 - **Maps**: [Leaflet](https://leafletjs.org/) & [React-Leaflet](https://react-leaflet.js.org/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **State & Routing**: React Context API & [React Router 7](https://reactrouter.com/)
@@ -76,7 +70,7 @@ SafeHer India is more than just an app; it's a digital guardian. Built to addres
 ## 📁 Project Structure
 
 ```bash
-safeHer_India/
+Safira/
 ├── backend/                # Express API & Server
 │   ├── src/
 │   │   ├── config/         # DB Connection
@@ -110,8 +104,8 @@ safeHer_India/
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/PriyanshCG/safeHer_India.git
-cd safeHer_India
+git clone https://github.com/Advitiya007/Safira.git
+cd Safira
 ```
 
 ### 2. Backend Configuration
@@ -135,7 +129,7 @@ npm run dev
 ---
 
 ## 🎨 Aesthetic & Design
-SafeHer India uses a curated color palette designed to evoke a sense of **peace, trust, and security**:
+Safira  uses a curated color palette designed to evoke a sense of **peace, trust, and security**:
 - **Sage Green (`#8D9D4F`)**: For balance and organic growth.
 - **Warm Gold (`#A18F5C`)**: For premium safety and resilience.
 - **Sunset Pink (`#C94A7D`)**: For feminine energy and action.
@@ -162,9 +156,9 @@ SafeHer India uses a curated color palette designed to evoke a sense of **peace,
 
 <div align="center">
 
-### 🛡️ SafeHer India
+### 🛡️ Safira 
 **"Your Safety. Our Priority."**
 
-*Made for the women of India, by someone who cares.*
+*Made for the women of , by someone who cares.*
 
 </div>
