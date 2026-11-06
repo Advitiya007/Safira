@@ -11,14 +11,14 @@ export default function PlaceCard({ poi }) {
 
     const getColors = (type) => {
         switch (type) {
-            case 'police': return 'bg-blue-100 text-[#4B7FBE]';
-            case 'hospital': return 'bg-red-100 text-[#DC2626]';
-            default: return 'bg-[#8B4A6A]/10 text-[#8B4A6A]';
+            case 'police': return 'bg-info/10 text-info';
+            case 'hospital': return 'bg-error/10 text-error';
+            default: return 'bg-primary-container/10 text-primary-container';
         }
     };
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-gray-200">
+        <div className="bg-card p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer border border-line">
             <div className="flex items-center space-x-4">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${getColors(poi.type)}`}>
                     <span className="material-symbols-outlined">{getIcon(poi.type)}</span>

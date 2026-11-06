@@ -4,7 +4,7 @@ export default function SOSButton({ onClick }) {
     return (
         <button
             onClick={onClick}
-            className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-error flex flex-col items-center justify-center text-white shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-transform group border-8 border-[#FCA5A5]/20"
+            className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-error flex flex-col items-center justify-center text-white shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-transform group border-8 border-error/20"
         >
             <div className="absolute inset-0 rounded-full animate-ping bg-error/30 z-0" style={{ animationDuration: '2s' }}></div>
             <div className="absolute inset-0 rounded-full animate-ping bg-error/20 z-0" style={{ animationDelay: '0.5s', animationDuration: '2.5s' }}></div>

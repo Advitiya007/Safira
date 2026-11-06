@@ -16,7 +16,7 @@ export default function DashboardSidebar() {
     ];
 
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 hidden md:block shrink-0">
+        <aside className="w-64 bg-card border-r border-line hidden md:block shrink-0">
             <div className="h-full flex flex-col pt-8">
                 <ul className="space-y-2 px-4">
                     {links.map(link => {
@@ -27,7 +27,7 @@ export default function DashboardSidebar() {
                                     to={link.path}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-lg font-body font-medium transition-colors ${isActive
                                             ? 'bg-primary/10 text-primary'
-                                            : 'text-on-surface-variant hover:bg-gray-50'
+                                            : 'text-on-surface-variant hover:bg-canvas'
                                         }`}
                                 >
                                     <span className="material-symbols-outlined">{link.icon}</span>
@@ -38,14 +38,14 @@ export default function DashboardSidebar() {
                     })}
                 </ul>
 
-                <div className="mt-auto p-4 border-t border-gray-200">
-                    <Link to="/pricing" className="flex flex-col gap-1 w-full bg-[#fdf5f8] border border-[#fce4ec] p-4 rounded-xl text-primary hover:bg-[#faeaf0] transition group relative overflow-hidden">
+                <div className="mt-auto p-4 border-t border-line">
+                    <Link to="/pricing" className="flex flex-col gap-1 w-full bg-soft border border-line p-4 rounded-xl text-primary hover:bg-soft-2 transition group relative overflow-hidden">
                         <div className="flex items-center gap-2">
                             <span className="animate-spin-slow">⭐</span>
                             <span className="text-xs font-bold uppercase tracking-widest text-secondary">Premium Guardian Plan</span>
                         </div>
                         <span className="font-bold font-serif text-lg">Upgrade to Pro</span>
-                        <span className="text-xs font-bold text-[#8B4A6A] mt-1">₹499/mo</span>
+                        <span className="text-xs font-bold text-primary-container mt-1">₹499/mo</span>
                     </Link>
                 </div>
             </div>

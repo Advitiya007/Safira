@@ -5,9 +5,9 @@ export default function PricingCard({ title, price, highlighted, features }) {
     const isPremium = highlighted;
 
     return (
-        <div className={`rounded-xl p-8 shadow-md border ${isPremium ? 'border-primary bg-[#F5F1E8]' : 'border-gray-200 bg-white'} relative flex flex-col`}>
+        <div className={`rounded-xl p-8 shadow-md border ${isPremium ? 'border-primary bg-canvas' : 'border-line bg-card'} relative flex flex-col`}>
             {isPremium && (
-                <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary-container text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                     Most Popular
                 </span>
             )}
@@ -27,7 +27,7 @@ export default function PricingCard({ title, price, highlighted, features }) {
                 ))}
             </ul>
 
-            <Link to="/payment" className={`text-center py-3 rounded-lg font-semibold transition mt-auto ${isPremium ? 'bg-primary text-white hover:bg-[#6B2A4A]' : 'border-2 border-primary text-primary hover:bg-gray-50'}`}>
+            <Link to="/payment" className={`text-center py-3 rounded-lg font-semibold transition mt-auto ${isPremium ? 'bg-primary-container text-white hover:bg-primary-hover' : 'border-2 border-primary text-primary hover:bg-canvas'}`}>
                 Choose {title}
             </Link>
         </div>

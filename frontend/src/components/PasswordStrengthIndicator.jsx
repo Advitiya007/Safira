@@ -31,10 +31,10 @@ const PasswordStrengthIndicator = ({ password }) => {
 
   const strengthMap = {
     0: { label: '', color: '', segments: 0 },
-    1: { label: 'Weak', color: '#ef4444', segments: 1 },
-    2: { label: 'Fair', color: '#f97316', segments: 2 },
-    3: { label: 'Strong', color: '#22c55e', segments: 3 },
-    4: { label: 'Very Strong', color: '#15803d', segments: 4 },
+    1: { label: 'Weak', color: 'rgb(var(--error))', segments: 1 },
+    2: { label: 'Fair', color: 'rgb(var(--warning))', segments: 2 },
+    3: { label: 'Strong', color: 'rgb(var(--success))', segments: 3 },
+    4: { label: 'Very Strong', color: 'rgb(var(--success))', segments: 4 },
   };
 
   const strength = password.length === 0 ? strengthMap[0] : strengthMap[metCount];
@@ -51,7 +51,7 @@ const PasswordStrengthIndicator = ({ password }) => {
             key={seg}
             className="pwd-strength-segment"
             style={{
-              backgroundColor: seg <= strength.segments ? strength.color : '#e5e7eb',
+              backgroundColor: seg <= strength.segments ? strength.color : 'rgb(var(--line))',
               transition: 'background-color 0.3s ease',
             }}
           />
@@ -69,7 +69,7 @@ const PasswordStrengthIndicator = ({ password }) => {
           <span
             key={i}
             className="pwd-strength-tag"
-            style={{ color: req.met ? '#16a34a' : '#9ca3af' }}
+            style={{ color: req.met ? 'rgb(var(--success))' : 'rgb(var(--ink-muted))' }}
           >
             {req.met ? '8+ chars' === req.label ? '8+ chars' : '' : ''}
           </span>
@@ -83,13 +83,13 @@ const PasswordStrengthIndicator = ({ password }) => {
             <span className="pwd-req-icon">
               {req.met ? (
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="9" stroke="#16a34a" strokeWidth="2" fill="none" />
-                  <path d="M6 10l3 3 5-5" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="10" cy="10" r="9" stroke="rgb(var(--success))" strokeWidth="2" fill="none" />
+                  <path d="M6 10l3 3 5-5" stroke="rgb(var(--success))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : (
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="9" stroke="#d1d5db" strokeWidth="2" fill="none" />
-                  <path d="M7 7l6 6M13 7l-6 6" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" />
+                  <circle cx="10" cy="10" r="9" stroke="rgb(var(--line))" strokeWidth="2" fill="none" />
+                  <path d="M7 7l6 6M13 7l-6 6" stroke="rgb(var(--line))" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               )}
             </span>

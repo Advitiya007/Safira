@@ -17,14 +17,14 @@ function VerificationButton({ guardian, onVerify }) {
         }
     }, [status, timeLeft]);
     if (status === 'verifying') {
-        return <span className="text-[#4B7FBE] font-bold flex items-center gap-2 text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Sending...</span>;
+        return <span className="text-info font-bold flex items-center gap-2 text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Sending...</span>;
     }
     if (status === 'cooldown' && timeLeft > 0) {
-        return <span className="text-gray-400 font-bold flex items-center gap-2 text-sm"><Clock className="w-4 h-4" /> Resend? ({timeLeft}s)</span>;
+        return <span className="text-ink-muted font-bold flex items-center gap-2 text-sm"><Clock className="w-4 h-4" /> Resend? ({timeLeft}s)</span>;
     }
 
     return (
-        <button onClick={handleClick} className="text-[#4B7FBE] font-bold hover:underline flex items-center gap-2 text-sm">           <Clock className="w-4 h-4" /> Send Verification       </button>
+        <button onClick={handleClick} className="text-info font-bold hover:underline flex items-center gap-2 text-sm">           <Clock className="w-4 h-4" /> Send Verification       </button>
     );
 }
 
@@ -124,121 +124,121 @@ export default function GuardianNetworkPage() {
 
             {/* Toast Notification */}
             {toast && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[2000] bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                <div role="status" aria-live="polite" className="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[2000] bg-card text-ink border border-line px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4">
+                    <CheckCircle className="w-5 h-5 text-success" />
                     <span className="font-label text-sm font-semibold">{toast.message}</span>
                 </div>)}
             {/* Edit Modal */}
             {editingGuardian && (
                 <div
-                    className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
+                    className="fixed inset-0 bg-deeper/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
                     onClick={() => setEditingGuardian(null)}
                 >
                     <div
-                        className="bg-white max-w-[480px] w-full rounded-2xl shadow-2xl p-8 animate-in zoom-in-95 duration-200"
+                        className="bg-card max-w-[480px] w-full rounded-2xl shadow-2xl p-8 animate-in zoom-in-95 duration-200"
                         onClick={e => e.stopPropagation()}
                     >
-                        <h3 className="text-2xl font-bold font-serif text-[#8B4A6A] mb-6">Edit Guardian</h3>
+                        <h3 className="text-2xl font-bold font-serif text-primary-container mb-6">Edit Guardian</h3>
                         <form onSubmit={handleEditSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="form-label text-sm font-bold text-[#6B5B6B]">Full Name</label>
+                                <label className="form-label text-sm font-bold text-ink-muted">Full Name</label>
                                 <input
                                     type="text"
-                                    className="form-input w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#8B4A6A] outline-none"
+                                    className="form-input w-full p-3 bg-canvas border border-line rounded-xl focus:border-primary-container outline-none"
                                     value={editingGuardian.guardianName || ''}
                                     onChange={(e) => setEditingGuardian({ ...editingGuardian, guardianName: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="form-label text-sm font-bold text-[#6B5B6B]">Phone Number</label>
+                                <label className="form-label text-sm font-bold text-ink-muted">Phone Number</label>
                                 <input
                                     type="tel"
-                                    className="form-input w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#8B4A6A] outline-none"
+                                    className="form-input w-full p-3 bg-canvas border border-line rounded-xl focus:border-primary-container outline-none"
                                     value={editingGuardian.guardianPhone || ''}
                                     onChange={(e) => setEditingGuardian({ ...editingGuardian, guardianPhone: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="form-label text-sm font-bold text-[#6B5B6B]">Relationship</label>
+                                <label className="form-label text-sm font-bold text-ink-muted">Relationship</label>
                                 <select
-                                    className="form-input w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-[#8B4A6A] outline-none"
+                                    className="form-input w-full p-3 bg-canvas border border-line rounded-xl focus:border-primary-container outline-none"
                                     value={editingGuardian.relationship}
                                     onChange={(e) => setEditingGuardian({ ...editingGuardian, relationship: e.target.value })}
                                 >
                                     <option>Mom</option>                                   <option>Dad</option>                                  <option>Sister</option>                                   <option>Brother</option>                                    <option>Friend</option>                                   <option>Partner</option><option>Other</option>
                                 </select>
                             </div>
-                            <div className="flex gap-4 mt-8 pt-4 border-t border-gray-100">
+                            <div className="flex gap-4 mt-8 pt-4 border-t border-line">
                                 <button
                                     type="button"
                                     onClick={() => setEditingGuardian(null)}
-                                    className="flex-1 py-3.5 bg-gray-100 text-[#6B5B6B] font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                    className="flex-1 py-3.5 bg-soft text-ink-muted font-bold rounded-xl hover:bg-soft transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 py-3.5 bg-[#8B4A6A] text-white font-bold rounded-xl hover:bg-[#6d3a53] transition-colors shadow-lg shadow-[#8B4A6A]/20"
+                                    className="flex-1 py-3.5 bg-primary-container text-white font-bold rounded-xl hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
                                 >
                                     Save Changes
                                 </button>
                             </div>                       </form>                    </div>                </div>
             )}
             <header className="mb-10">
-                <h1 className="text-4xl font-bold font-serif text-[#8B4A6A] mb-3 tracking-tight">Guardian Network</h1>
-                <p className="text-[#6B5B6B] font-body text-lg">Manage your inner circle of trusted people who will be notified in emergencies.</p>
+                <h1 className="text-4xl font-bold font-serif text-primary-container mb-3 tracking-tight">Guardian Network</h1>
+                <p className="text-ink-muted font-body text-lg">Manage your inner circle of trusted people who will be notified in emergencies.</p>
             </header>
             {/* Guardian Limit Indicator */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-line mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                    <h3 className="font-bold text-[#2D1B2E] text-lg">Guardian Slots: {guardians.length} / {MAX_GUARDIANS} used</h3>
-                    <p className="text-xs font-bold text-[#8B4A6A] mt-1 bg-[#8B4A6A]/10 inline-block px-2 py-1 rounded-md">Upgrade to Premium for unlimited guardians</p>
+                    <h3 className="font-bold text-ink text-lg">Guardian Slots: {guardians.length} / {MAX_GUARDIANS} used</h3>
+                    <p className="text-xs font-bold text-primary-container mt-1 bg-primary-container/10 inline-block px-2 py-1 rounded-md">Upgrade to Premium for unlimited guardians</p>
                 </div>
-                <div className="w-full md:w-72 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full md:w-72 h-3 bg-soft rounded-full overflow-hidden">
                     <div
-                        className={`h-full transition-all duration-500 ${isLimitReached ? 'bg-[#DC2626]' : 'bg-[#8B4A6A]'}`}
+                        className={`h-full transition-all duration-500 ${isLimitReached ? 'bg-error' : 'bg-primary-container'}`}
                         style={{ width: `${(guardians.length / MAX_GUARDIANS) * 100}%` }}
                     />
                 </div></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Left Column: Form */}
                 <div className="lg:col-span-1">
-                    <div className="card-premium h-fit border border-gray-100 shadow-xl shadow-[#8B4A6A]/5">
-                        <div className="flex items-center gap-3 mb-6 text-[#8B4A6A]">
+                    <div className="card-premium h-fit border border-line shadow-xl shadow-primary/5">
+                        <div className="flex items-center gap-3 mb-6 text-primary-container">
                             <UserPlus className="w-6 h-6" />
-                            <h3 className="text-xl font-bold font-serif text-[#2D1B2E]">Add New Guardian</h3>
+                            <h3 className="text-xl font-bold font-serif text-ink">Add New Guardian</h3>
                         </div>
                         {isLimitReached ? (
-                            <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-start gap-3 mb-4">
+                            <div className="bg-error/10 text-error p-4 rounded-xl border border-error/20 flex items-start gap-3 mb-4">
                                 <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />
                                 <p className="text-sm font-bold">Limit reached. Upgrade to Premium to add more trusted contacts.</p>
                             </div>
                         ) : (
                             <form onSubmit={handleAdd} className="space-y-5">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-[#6B5B6B] uppercase tracking-wider">Full Name</label>
+                                    <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Full Name</label>
                                     <input
                                         type="text"
                                         placeholder="e.g. John Doe"
-                                        className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-[#8B4A6A] outline-none transition-all"
+                                        className="w-full p-3.5 bg-canvas border border-line rounded-xl focus:bg-card focus:border-primary-container outline-none transition-all"
                                         value={formData.guardianName}
                                         onChange={(e) => setFormData({ ...formData, guardianName: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-[#6B5B6B] uppercase tracking-wider">Phone Number</label>
+                                    <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Phone Number</label>
                                     <input
                                         type="tel"
                                         placeholder="+91 XXXXXXXXXX"
-                                        className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-[#8B4A6A] outline-none transition-all"
+                                        className="w-full p-3.5 bg-canvas border border-line rounded-xl focus:bg-card focus:border-primary-container outline-none transition-all"
                                         value={formData.guardianPhone}
                                         onChange={(e) => setFormData({ ...formData, guardianPhone: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-[#6B5B6B] uppercase tracking-wider">Relationship</label>
+                                    <label className="text-xs font-bold text-ink-muted uppercase tracking-wider">Relationship</label>
                                     <select
-                                        className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-[#8B4A6A] outline-none transition-all appearance-none"
+                                        className="w-full p-3.5 bg-canvas border border-line rounded-xl focus:bg-card focus:border-primary-container outline-none transition-all appearance-none"
                                         value={formData.relationship}
                                         onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
                                     >
@@ -251,7 +251,7 @@ export default function GuardianNetworkPage() {
                                         <option>Other</option>
                                     </select>
                                 </div>
-                                <button type="submit" className="w-full mt-4 py-3.5 bg-[#8B4A6A] hover:bg-[#6d3a53] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#8B4A6A]/20">
+                                <button type="submit" className="w-full mt-4 py-3.5 bg-primary-container hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-lg shadow-primary/20">
                                     Add Guardian
                                 </button>
                             </form>
@@ -263,38 +263,38 @@ export default function GuardianNetworkPage() {
                 <div className="lg:col-span-2 space-y-6">
 
                     {guardians.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border-2 border-dashed border-gray-200">
-                            <div className="w-20 h-20 bg-[#8B4A6A]/10 rounded-full flex items-center justify-center mb-6">
-                                <Shield className="w-10 h-10 text-[#8B4A6A]" />
+                        <div className="flex flex-col items-center justify-center py-20 text-center bg-card rounded-3xl border-2 border-dashed border-line">
+                            <div className="w-20 h-20 bg-primary-container/10 rounded-full flex items-center justify-center mb-6">
+                                <Shield className="w-10 h-10 text-primary-container" />
                             </div>
-                            <h3 className="text-2xl font-bold font-serif text-[#2D1B2E] mb-2">No Guardians Yet</h3>
-                            <p className="text-[#6B5B6B]">Add your first trusted contact using the form.</p>
+                            <h3 className="text-2xl font-bold font-serif text-ink mb-2">No Guardians Yet</h3>
+                            <p className="text-ink-muted">Add your first trusted contact using the form.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {guardians.map((guardian) => (
-                                <div key={guardian._id || guardian.id} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 group relative hover:border-[#8B4A6A]/30 hover:shadow-md transition-all">
+                                <div key={guardian._id || guardian.id} className="bg-card rounded-3xl p-6 shadow-sm border border-line group relative hover:border-primary-container/30 hover:shadow-md transition-all">
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-14 h-14 rounded-full ${getAvatarColor(guardian.relationship)} flex items-center justify-center text-white font-black text-xl shadow-inner`}>
                                                 {getInitials(guardian.guardianName)}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-lg text-[#2D1B2E]">{guardian.guardianName}</h4>
-                                                <p className="text-xs font-bold text-[#6B5B6B] uppercase tracking-wider mt-0.5">{guardian.relationship}</p>
+                                                <h4 className="font-bold text-lg text-ink">{guardian.guardianName}</h4>
+                                                <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mt-0.5">{guardian.relationship}</p>
                                             </div>
                                         </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-sm border border-gray-100 rounded-lg p-1 absolute top-6 right-6">
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-card shadow-sm border border-line rounded-lg p-1 absolute top-6 right-6">
                                             <button
                                                 onClick={() => setEditingGuardian(guardian)}
-                                                className="p-2 text-gray-400 hover:text-[#8B4A6A] hover:bg-gray-50 rounded-md transition-colors"
+                                                className="p-2 text-ink-muted hover:text-primary-container hover:bg-canvas rounded-md transition-colors"
                                                 title="Edit"
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => removeGuardian(guardian._id || guardian.id)}
-                                                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                className="p-2 text-ink-muted hover:text-error hover:bg-error/10 rounded-md transition-colors"
                                                 title="Remove"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -303,8 +303,8 @@ export default function GuardianNetworkPage() {
                                     </div>
 
                                     <div className="mt-6 space-y-4">
-                                        <div className="flex items-center gap-3 text-sm text-[#2D1B2E] font-medium bg-gray-50 p-3 rounded-xl">
-                                            <Phone className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center gap-3 text-sm text-ink font-medium bg-canvas p-3 rounded-xl">
+                                            <Phone className="w-4 h-4 text-ink-muted" />
                                             <span className="flex-1 font-mono" aria-label="Trusted contact phone number">
                                                 {revealedPhones[guardian._id || guardian.id]
                                                     ? guardian.guardianPhone
@@ -316,7 +316,7 @@ export default function GuardianNetworkPage() {
                                                     ...current,
                                                     [guardian._id || guardian.id]: !current[guardian._id || guardian.id],
                                                 }))}
-                                                className="rounded-md p-1.5 text-gray-500 hover:bg-white hover:text-primary"
+                                                className="rounded-md p-1.5 text-ink-muted hover:bg-card hover:text-primary"
                                                 aria-label={revealedPhones[guardian._id || guardian.id] ? 'Hide phone number' : 'Show phone number'}
                                             >
                                                 {revealedPhones[guardian._id || guardian.id]
@@ -327,7 +327,7 @@ export default function GuardianNetworkPage() {
 
                                         <div className="flex items-center justify-between px-1">
                                             {guardian.isVerified ? (
-                                                <span className="flex items-center gap-2 text-green-600 font-bold text-sm">
+                                                <span className="flex items-center gap-2 text-success font-bold text-sm">
                                                     <CheckCircle className="w-4 h-4" /> Verified
                                                 </span>
                                             ) : (
@@ -338,26 +338,26 @@ export default function GuardianNetworkPage() {
                                         {guardian.isVerified && (
                                             <button
                                                 onClick={() => handleTestAlert(guardian)}
-                                                className="w-full py-2.5 bg-[#8B4A6A]/5 hover:bg-[#8B4A6A]/10 text-[#8B4A6A] rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-colors mt-2"
+                                                className="w-full py-2.5 bg-primary-container/5 hover:bg-primary-container/10 text-primary-container rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-colors mt-2"
                                             >
                                                 <Shield className="w-4 h-4" /> Send Test Alert
                                             </button>
                                         )}
                                     </div>
-                                    <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-[#6B5B6B]">
+                                    <div className="mt-5 pt-4 border-t border-line flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-ink-muted">
                                         <span>Last Alert:</span>
-                                        <span className={guardian.lastAlert === 'Never' ? 'text-gray-400' : 'text-[#8B4A6A]'}>{guardian.lastAlert}</span>
+                                        <span className={guardian.lastAlert === 'Never' ? 'text-ink-muted' : 'text-primary-container'}>{guardian.lastAlert}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
-                    <div className="p-8 rounded-3xl bg-[#4B7FBE]/5 border-2 border-dashed border-[#4B7FBE]/20 mt-8">
+                    <div className="p-8 rounded-3xl bg-info/5 border-2 border-dashed border-info/20 mt-8">
                         <div className="flex items-start gap-4">
-                            <Shield className="w-8 h-8 text-[#4B7FBE] mt-1" />
+                            <Shield className="w-8 h-8 text-info mt-1" />
                             <div>
-                                <h4 className="text-lg font-bold text-[#2D1B2E] mb-1">Safety Verification Status</h4>
-                                <p className="text-sm text-[#6B5B6B] leading-relaxed">Ensure all guardians have verified their phone numbers to receive real-time SOS alerts via SMS. Unverified guardians will only receive in-app push notifications.</p>
+                                <h4 className="text-lg font-bold text-ink mb-1">Safety Verification Status</h4>
+                                <p className="text-sm text-ink-muted leading-relaxed">Ensure all guardians have verified their phone numbers to receive real-time SOS alerts via SMS. Unverified guardians will only receive in-app push notifications.</p>
                             </div>
                         </div>
                     </div>

@@ -20,15 +20,19 @@ import Settings from '../pages/SettingsPage';
 import NotFound from '../pages/NotFound';
 
 // Global Layout wrapper
-const StandardLayout = ({ children }) => (
-    <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
-        <main className="flex-1 flex flex-col pt-[72px] pb-16 md:pb-0">
-            {children}
-        </main>
-        <MobileBottomNav />
-    </div>
-);
+const StandardLayout = ({ children }) => {
+    const { isAuthenticated } = useAuth();
+
+    return (
+        <div className="min-h-[100dvh] flex flex-col bg-background">
+            <Navbar />
+            <main className={`flex-1 flex flex-col pt-[72px] ${isAuthenticated ? 'pb-24 md:pb-0' : ''}`}>
+                {children}
+            </main>
+            {isAuthenticated && <MobileBottomNav />}
+        </div>
+    );
+};
 
 // Protected Route Component
 const PrivateRoute = ({ children }) => {

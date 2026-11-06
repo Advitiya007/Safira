@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ThemeContext } from './safiraThemeContext';
-const THEMES = ['green', 'blue', 'black'];
-const DEFAULT_THEME = 'green';
+const THEMES = ['rose', 'teal', 'indigo', 'dark'];
+
+const getSystemTheme = () => (
+  window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'rose'
+);
 
 const getSavedTheme = () => {
   try {
     const savedTheme = window.localStorage.getItem('safira-theme');
-    return THEMES.includes(savedTheme) ? savedTheme : DEFAULT_THEME;
+    return THEMES.includes(savedTheme) ? savedTheme : getSystemTheme();
   } catch {
-    return DEFAULT_THEME;
+    return getSystemTheme();
   }
 };
 
@@ -24,6 +27,12 @@ export function ThemeProvider({ children }) {
     }
   }, [theme]);
 
-  const value = useMemo(() => ({ theme, setTheme, themes: THEMES }), [theme]);
+  const value = useMemo(() => ({
+    theme,
+    setTheme: (nextTheme) => {
+      if (THEMES.includes(nextTheme)) setTheme(nextTheme);
+    },
+    themes: THEMES,
+  }), [theme]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

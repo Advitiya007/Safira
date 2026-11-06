@@ -15,9 +15,9 @@ export default function FAQAccordion() {
     return (
         <div className="max-w-3xl mx-auto space-y-4">
             {FAQ_DATA.map((faq, idx) => (
-                <div key={idx} className="border border-gray-200 bg-white rounded-lg overflow-hidden shadow-sm">
+                <div key={idx} className="border border-line bg-card rounded-lg overflow-hidden shadow-sm">
                     <button
-                        className="w-full px-6 py-4 text-left font-serif font-bold text-on-surface flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition"
+                        className="w-full px-6 py-4 text-left font-serif font-bold text-on-surface flex justify-between items-center bg-canvas hover:bg-soft transition"
                         onClick={() => toggle(idx)}
                     >
                         {faq.q}
@@ -27,7 +27,7 @@ export default function FAQAccordion() {
                     </button>
 
                     {openIdx === idx && (
-                        <div className="px-6 py-4 font-body text-on-surface-variant bg-white border-t border-gray-100">
+                        <div className="px-6 py-4 font-body text-on-surface-variant bg-card border-t border-line">
                             {faq.a}
                         </div>
                     )}

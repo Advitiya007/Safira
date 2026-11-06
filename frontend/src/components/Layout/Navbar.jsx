@@ -13,16 +13,14 @@ import {
     Settings,
     LogOut,
     ShieldCheck as Shield,
-    Palette
 } from 'lucide-react';
 import { ROUTES } from '../../utils/constants';
 import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../hooks/useTheme';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { isAuthenticated, logout } = useAuth();
-    const { theme, setTheme, themes } = useTheme();
     const navLinks = [
         { name: 'Dashboard', path: ROUTES.DASHBOARD, icon: LayoutDashboard },
         { name: 'Safety Map', path: ROUTES.MAP, icon: MapIcon },
@@ -33,10 +31,10 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm border-b border-outline-variant/20 h-[72px] px-6 lg:px-12 flex items-center justify-between">
+        <nav className="fixed top-0 left-0 w-full z-50 bg-card shadow-sm border-b border-line/20 h-[72px] px-4 sm:px-6 lg:px-12 flex items-center justify-between">
             {/* Left: Branding */}
             <Link to={ROUTES.HOME} className="flex items-center gap-3 group">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform">
+                <div className="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform">
                     <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex flex-col">
@@ -66,22 +64,7 @@ export default function Navbar() {
 
             {/* Right: Actions */}
             <div className="hidden xl:flex items-center gap-6">
-                <label className="flex items-center gap-2 text-xs font-bold text-on-surface/70">
-                    <Palette className="h-4 w-4 text-primary" />
-                    <span className="sr-only">Color theme</span>
-                    <select
-                        aria-label="Color theme"
-                        value={theme}
-                        onChange={(event) => setTheme(event.target.value)}
-                        className="rounded-lg border border-outline-variant bg-white px-2 py-2 text-xs font-bold text-on-surface"
-                    >
-                        {themes.map((option) => (
-                            <option key={option} value={option}>
-                                {option[0].toUpperCase() + option.slice(1)}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                <ThemeSwitcher />
                 {isAuthenticated ? (
                     <>
                         <Link to={ROUTES.SETTINGS} className="p-2 text-on-surface/60 hover:text-primary transition-colors">
@@ -89,7 +72,7 @@ export default function Navbar() {
                         </Link>
                         <button
                             onClick={logout}
-                            className="px-6 py-2.5 bg-primary/10 text-primary rounded-xl font-label font-bold text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
+                            className="px-6 py-2.5 bg-primary/10 text-primary rounded-xl font-label font-bold text-xs uppercase tracking-widest hover:bg-primary-container hover:text-white transition-all"
                         >
                             Logout
                         </button>
@@ -97,7 +80,7 @@ export default function Navbar() {
                 ) : (
                     <div className="flex items-center gap-6">
                         <Link to={ROUTES.LOGIN} className="text-xs font-bold font-label text-on-surface/60 hover:text-primary uppercase tracking-widest">Log in</Link>
-                        <Link to={ROUTES.SIGNUP} className="px-8 py-3 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 btn-3d">
+                        <Link to={ROUTES.SIGNUP} className="px-8 py-3 bg-primary-container text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 btn-3d">
                             Get Started Free
                         </Link>
                     </div>
@@ -108,32 +91,21 @@ export default function Navbar() {
             <button
                 className="xl:hidden p-2 text-primary"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                type="button"
+                aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={isMenuOpen}
             >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant/30 xl:hidden shadow-2xl animate-in slide-in-from-top-4 p-6">
+                <div className="absolute top-[72px] left-0 w-full bg-card border-b border-line/30 xl:hidden shadow-2xl animate-in slide-in-from-top-4 p-4 sm:p-6">
                     <div className="flex flex-col gap-2">
-                        <label className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm font-bold text-on-surface">
-                            <span className="inline-flex items-center gap-2">
-                                <Palette className="h-4 w-4 text-primary" />
-                                Color theme
-                            </span>
-                            <select
-                                aria-label="Color theme"
-                                value={theme}
-                                onChange={(event) => setTheme(event.target.value)}
-                                className="rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm text-on-surface"
-                            >
-                                {themes.map((option) => (
-                                    <option key={option} value={option}>
-                                        {option[0].toUpperCase() + option.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm font-bold text-on-surface">
+                            <span>Color theme</span>
+                            <ThemeSwitcher />
+                        </div>
                         {navLinks.map((link) => (
                             <NavLink
                                 key={link.path}
@@ -141,7 +113,7 @@ export default function Navbar() {
                                 onClick={() => setIsMenuOpen(false)}
                                 className={({ isActive }) =>
                                     `flex items-center gap-4 px-6 py-4 rounded-xl font-label font-bold uppercase tracking-widest text-sm ${isActive
-                                        ? 'bg-primary text-white'
+                                        ? 'bg-primary-container text-white'
                                         : 'text-on-surface/60 hover:bg-surface-container-low'
                                     }`
                                 }
@@ -153,12 +125,12 @@ export default function Navbar() {
                         {!isAuthenticated ? (
                             <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-outline-variant/20">
                                 <Link to={ROUTES.LOGIN} onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-bold text-on-surface/60 uppercase tracking-widest text-sm">Log in</Link>
-                                <Link to={ROUTES.SIGNUP} onClick={() => setIsMenuOpen(false)} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-center uppercase tracking-widest text-sm shadow-lg shadow-primary/20">Sign up Free</Link>
+                                <Link to={ROUTES.SIGNUP} onClick={() => setIsMenuOpen(false)} className="w-full py-4 bg-primary-container text-white rounded-xl font-bold text-center uppercase tracking-widest text-sm shadow-lg shadow-primary/20">Sign up Free</Link>
                             </div>
                         ) : (
                             <button
                                 onClick={() => { logout(); setIsMenuOpen(false); }}
-                                className="w-full flex items-center gap-4 px-6 py-4 text-red-500 font-bold uppercase tracking-widest text-sm"
+                                className="w-full flex items-center gap-4 px-6 py-4 text-error font-bold uppercase tracking-widest text-sm"
                             >
                                 <LogOut className="w-5 h-5" />
                                 Logout

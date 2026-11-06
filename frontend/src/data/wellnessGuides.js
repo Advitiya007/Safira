@@ -6,7 +6,7 @@ export const WELLNESS_GUIDES = [
     desc: 'Simple routines you can incorporate into your daily life to stay alert and prepared for any situation.',
     time: '5 min read',
     image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=400',
-    accent: '#E67E22',
+    accent: 'warning',
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ export const WELLNESS_GUIDES = [
     desc: 'Understanding the power of safe spaces and sisterhood in overcoming anxiety and trauma.',
     time: '8 min read',
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=400',
-    accent: '#2ECC71',
+    accent: 'success',
   },
   {
     id: 3,
@@ -24,7 +24,7 @@ export const WELLNESS_GUIDES = [
     desc: 'A comprehensive guide to navigating public transport, accommodation, and late-night travel safely.',
     time: '12 min read',
     image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=400',
-    accent: '#3498DB',
+    accent: 'info',
   },
   {
     id: 4,
@@ -33,7 +33,7 @@ export const WELLNESS_GUIDES = [
     desc: 'How to use verbal techniques and body language to defuse potentially dangerous confrontations.',
     time: '6 min read',
     image: 'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?auto=format&fit=crop&q=80&w=400',
-    accent: '#9B59B6',
+    accent: 'primary',
   },
   {
     id: 5,
@@ -42,7 +42,7 @@ export const WELLNESS_GUIDES = [
     desc: 'Psychological strategies to project confidence and deter unwanted attention in crowded spaces.',
     time: '7 min read',
     image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=400',
-    accent: '#E74C3C',
+    accent: 'error',
   },
   {
     id: 6,
@@ -51,6 +51,6 @@ export const WELLNESS_GUIDES = [
     desc: 'Quick breathing exercises and grounding techniques used by first responders to stay calm.',
     time: '4 min read',
     image: 'https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&q=80&w=400',
-    accent: '#1ABC9C',
+    accent: 'success',
   },
 ];

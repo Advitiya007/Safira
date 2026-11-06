@@ -7,22 +7,22 @@ const ProgressBar = ({ currentStep }) => {
         <div className="flex items-center">
           <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
             currentStep >= 1 
-              ? 'bg-[#C94A7D] text-white' 
-              : 'bg-gray-200 text-gray-500'
+              ? 'bg-primary-container text-white'
+              : 'bg-soft text-ink-muted'
           }`}>
             1
           </div>
           <span className={`ml-2 text-sm font-semibold ${
-            currentStep >= 1 ? 'text-[#8B4A6A]' : 'text-gray-400'
+            currentStep >= 1 ? 'text-primary-container' : 'text-ink-muted'
           }`}>
             Essential Details
           </span>
         </div>
         
         <div className="flex-1 mx-4">
-          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-1 bg-soft rounded-full overflow-hidden">
             <div 
-              className={`h-full bg-[#C94A7D] transition-all duration-300 ${
+              className={`h-full bg-primary-container transition-all duration-300 ${
                 currentStep === 1 ? 'w-1/2' : 'w-full'
               }`}
             />
@@ -32,13 +32,13 @@ const ProgressBar = ({ currentStep }) => {
         <div className="flex items-center">
           <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
             currentStep >= 2 
-              ? 'bg-[#C94A7D] text-white' 
-              : 'bg-gray-200 text-gray-500'
+              ? 'bg-primary-container text-white'
+              : 'bg-soft text-ink-muted'
           }`}>
             2
           </div>
           <span className={`ml-2 text-sm font-semibold ${
-            currentStep >= 2 ? 'text-[#8B4A6A]' : 'text-gray-400'
+            currentStep >= 2 ? 'text-primary-container' : 'text-ink-muted'
           }`}>
             Emergency Contact
           </span>
@@ -46,7 +46,7 @@ const ProgressBar = ({ currentStep }) => {
       </div>
       
       <div className="text-center">
-        <span className="text-sm text-[#8B4A6A] font-medium">
+        <span className="text-sm text-primary-container font-medium">
           Step {currentStep} of 2 → {currentStep === 1 ? 'Essential Details' : 'Emergency Contact'}
         </span>
       </div>

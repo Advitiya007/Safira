@@ -88,12 +88,12 @@
 }
 
 .pwd-req-met .pwd-req-text {
-  color: #16a34a;
+  color: rgb(var(--success));
   font-weight: 600;
 }
 
 .pwd-req-unmet .pwd-req-text {
-  color: #9ca3af;
+  color: rgb(var(--ink-muted));
   font-weight: 400;
 }
 

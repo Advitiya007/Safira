@@ -29,22 +29,22 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
   return (
     <div className="fade-in">
       {/* Heading */}
-      <h2 className="text-3xl font-bold font-serif text-[#2D1B2E] mb-2">
+      <h2 className="text-3xl font-bold font-serif text-ink mb-2">
         One more thing...
       </h2>
-      <p className="text-sm text-[#6B5B6B] mb-8">
+      <p className="text-sm text-ink-muted mb-8">
         Add your primary emergency contact to stay protected
       </p>
 
       {/* Emergency Contact Information Section */}
-      <div className="bg-[#FFF5F7] border-l-4 border-[#C94A7D] p-6 rounded-lg mb-8">
+      <div className="bg-soft border-l-4 border-primary-container p-6 rounded-lg mb-8">
         <div className="flex items-start gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <h3 className="font-semibold text-[#8B4A6A] mb-2">
+            <h3 className="font-semibold text-primary-container mb-2">
               Primary Emergency Contact
             </h3>
-            <p className="text-sm text-[#6B5B6B]">
+            <p className="text-sm text-ink-muted">
               This person will be immediately notified when you trigger SOS or share your location
             </p>
           </div>
@@ -55,7 +55,7 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
       <div className="space-y-6">
         {/* Contact Name */}
         <div>
-          <label className="block text-sm font-semibold text-[#2D1B2E] mb-2 font-serif">
+          <label className="block text-sm font-semibold text-ink mb-2 font-serif">
             Contact Name (e.g., Mom, Best Friend, Sister)
           </label>
           <input
@@ -66,23 +66,23 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
             placeholder="Enter contact name"
             className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
               errors.emergencyContactName 
-                ? 'border-red-500' 
-                : 'border-gray-300 focus:border-[#8B4A6A] focus:ring-2 focus:ring-[#8B4A6A]'
+                ? 'border-error'
+                : 'border-line focus:border-primary-container focus:ring-2 focus:ring-primary-container'
             }`}
           />
           {errors.emergencyContactName && (
-            <p className="mt-1 text-sm text-red-500">{errors.emergencyContactName}</p>
+            <p className="mt-1 text-sm text-error">{errors.emergencyContactName}</p>
           )}
         </div>
 
         {/* Contact Phone Number */}
         <div>
-          <label className="block text-sm font-semibold text-[#2D1B2E] mb-2 font-serif">
+          <label className="block text-sm font-semibold text-ink mb-2 font-serif">
             Contact Phone Number
           </label>
           <div className="flex gap-2">
-            <div className="flex items-center px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-50">
-              <span className="text-gray-600 font-medium">+91</span>
+            <div className="flex items-center px-4 py-3 border-2 border-line rounded-lg bg-canvas">
+              <span className="text-ink-muted font-medium">+91</span>
             </div>
             <input
               type="tel"
@@ -93,19 +93,19 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
               maxLength="10"
               className={`flex-1 px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
                 errors.emergencyContactPhone 
-                  ? 'border-red-500' 
-                  : 'border-gray-300 focus:border-[#8B4A6A] focus:ring-2 focus:ring-[#8B4A6A]'
+                  ? 'border-error'
+                  : 'border-line focus:border-primary-container focus:ring-2 focus:ring-primary-container'
               }`}
             />
           </div>
           {errors.emergencyContactPhone && (
-            <p className="mt-1 text-sm text-red-500">{errors.emergencyContactPhone}</p>
+            <p className="mt-1 text-sm text-error">{errors.emergencyContactPhone}</p>
           )}
         </div>
 
         {/* Relationship */}
         <div>
-          <label className="block text-sm font-semibold text-[#2D1B2E] mb-2 font-serif">
+          <label className="block text-sm font-semibold text-ink mb-2 font-serif">
             Relationship
           </label>
           <select
@@ -114,8 +114,8 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
             onChange={handleInputChange}
             className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
               errors.emergencyContactRelationship 
-                ? 'border-red-500' 
-                : 'border-gray-300 focus:border-[#8B4A6A] focus:ring-2 focus:ring-[#8B4A6A]'
+                ? 'border-error'
+                : 'border-line focus:border-primary-container focus:ring-2 focus:ring-primary-container'
             }`}
           >
             <option value="">Select relationship</option>
@@ -130,7 +130,7 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
             <option value="Other">Other</option>
           </select>
           {errors.emergencyContactRelationship && (
-            <p className="mt-1 text-sm text-red-500">{errors.emergencyContactRelationship}</p>
+            <p className="mt-1 text-sm text-error">{errors.emergencyContactRelationship}</p>
           )}
         </div>
       </div>
@@ -141,7 +141,7 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
         <button
           onClick={onSkip}
           disabled={isLoading}
-          className="flex-1 py-3 px-6 border-2 border-[#8B4A6A] text-[#8B4A6A] font-semibold rounded-lg hover:bg-[#F5F1E8] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 border-2 border-primary-container text-primary-container font-semibold rounded-lg hover:bg-canvas transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Processing...' : 'SKIP'}
         </button>
@@ -150,19 +150,19 @@ const SignupStep2 = ({ formData, setFormData, errors, onContinue, onSkip, isLoad
         <button
           onClick={onContinue}
           disabled={isLoading}
-          className="flex-1 py-3 px-6 bg-[#8B4A6A] text-white font-semibold rounded-lg hover:bg-[#6B2A4A] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 py-3 px-6 bg-primary-container text-white font-semibold rounded-lg hover:bg-primary-hover transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Saving...' : 'SAVE & CONTINUE'}
         </button>
       </div>
 
       {/* Bottom Text */}
-      <p className="text-xs text-gray-400 text-center mt-4">
+      <p className="text-xs text-ink-muted text-center mt-4">
         You can add more contacts later in Guardian Network
       </p>
 
       {/* Security Badge */}
-      <div className="flex items-center justify-center mt-6 text-xs text-gray-400">
+      <div className="flex items-center justify-center mt-6 text-xs text-ink-muted">
         <span className="mr-2">🔒</span>
         <span>256-bit encrypted, RBI compliant</span>
       </div>

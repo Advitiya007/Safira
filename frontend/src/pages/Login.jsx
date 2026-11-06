@@ -31,17 +31,17 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-full bg-surface text-on-surface font-body antialiased flex overflow-hidden relative">
+    <div className="min-h-[100dvh] w-full bg-surface text-on-surface font-body antialiased flex overflow-x-hidden relative">
       {/* LEFT COLUMN - LOGIN FORM (50% width) */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center relative bg-white">
+      <div className="min-h-[100dvh] w-full lg:w-1/2 flex flex-col justify-center items-center relative bg-card px-4 py-20 sm:px-6 lg:px-8">
         <div className="bg-texture"></div>
 
         {/* Mobile Header */}
-        <div className="lg:hidden absolute top-0 left-0 w-full p-6 flex justify-between items-center bg-white/80 backdrop-blur-md">
+        <div className="lg:hidden absolute top-0 left-0 w-full p-4 sm:p-6 flex justify-between items-center bg-card/80 backdrop-blur-md">
           <h1 className="font-headline text-2xl font-bold text-primary tracking-tight">Safira</h1>
         </div>
 
-        <div className="w-full max-w-[420px] bg-white rounded-[24px] p-10 relative z-10" style={{ boxShadow: "0 10px 40px -10px rgba(138, 43, 87, 0.12)" }}>
+        <div className="w-full max-w-[420px] bg-card rounded-[24px] p-5 sm:p-8 lg:p-10 relative z-10 shadow-xl shadow-primary/10">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
               <span className="material-symbols-outlined text-2xl">shield</span>
@@ -58,7 +58,7 @@ export default function Login() {
                   <span className="material-symbols-outlined text-xl">mail</span>
                 </span>
                 <input
-                  className="w-full pl-11 pr-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 transition-all font-body text-sm text-on-surface"
+                  className="w-full min-h-12 pl-11 pr-4 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 transition-all font-body text-base text-on-surface"
                   id="email"
                   placeholder="priya@example.com"
                   type="email"
@@ -79,7 +79,7 @@ export default function Login() {
                   <span className="material-symbols-outlined text-xl">lock</span>
                 </span>
                 <input
-                  className="w-full pl-11 pr-11 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 transition-all font-body text-sm text-on-surface"
+                  className="w-full min-h-12 pl-11 pr-11 py-3 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary/20 transition-all font-body text-base text-on-surface"
                   id="password"
                   placeholder="••••••••"
                   type={showPassword ? "text" : "password"}
@@ -89,8 +89,9 @@ export default function Login() {
                 />
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-outline hover:text-on-surface transition-colors"
+                  className="absolute inset-y-0 right-0 min-h-11 min-w-11 pr-3.5 flex items-center justify-center text-outline hover:text-on-surface transition-colors"
                   type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
@@ -98,12 +99,12 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg border border-red-100 text-center font-medium">
+              <div role="alert" className="bg-error/10 text-error text-sm p-3 rounded-lg border border-error/20 text-center font-medium">
                 {error}
               </div>
             )}
             <button 
-              className="w-full mt-2 h-[52px] bg-primary text-white font-headline font-semibold text-lg rounded-xl transition-all hover:bg-primary/90 active:scale-[0.98] flex justify-center items-center shadow-lg shadow-primary/20 disabled:opacity-70" 
+              className="w-full mt-2 h-[52px] bg-primary-container text-white font-headline font-semibold text-lg rounded-xl transition-all hover:bg-primary-hover active:scale-[0.98] flex justify-center items-center shadow-lg shadow-primary/20 disabled:opacity-70"
               type="submit"
               disabled={loading}
             >
@@ -118,7 +119,7 @@ export default function Login() {
               <div className="h-[1px] bg-outline-variant/30 flex-1"></div>
             </div>
 
-            <button className="w-full flex items-center justify-center gap-3 py-3 bg-white border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface font-label text-sm font-semibold shadow-sm" type="button">
+            <button className="w-full flex items-center justify-center gap-3 py-3 bg-card border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface font-label text-sm font-semibold shadow-sm" type="button">
               <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
@@ -134,9 +135,9 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="absolute bottom-8 flex items-center justify-center gap-2 text-outline/60">
+        <div className="relative mt-6 flex items-center justify-center gap-2 text-outline/60 text-center">
           <span className="material-symbols-outlined text-sm">lock</span>
-          <span className="font-label text-[12px] font-medium uppercase tracking-wider">End-to-end encrypted for your safety</span>
+          <span className="font-label text-[12px] font-medium uppercase tracking-wider">Review your trusted contacts and sharing settings</span>
         </div>
       </div>
 
@@ -148,14 +149,14 @@ export default function Login() {
             className="w-full h-full object-cover"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQfbHtUDsY34cJ3jS7FouKIDYSuqsBj6U6tkmrX8uH80Laqh4uJxnKtLn7yF5X6lHXBeMXXIS-p5J0fSCaQOEKfxCPkz6zTyrELHRmeNqUg-4Wrt3KJlhxJf0crMEmKtkOxUZedbzl3s20visD2e1KL8HxXLGSuDec3cMBpOicGlMkExVDa63H6V2V-ux_b7sP97N2Y3p8ZRj1_jWj8vGwkINagxFnMNgW3E6x2Omm81V6hip0waIWKl8naIpg-gbIk54bWwgoWUjl"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#3e0021]/90 via-[#3e0021]/40 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#3e0021]/30 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/30 to-transparent"></div>
         </div>
 
         <div className="relative z-10 h-full flex flex-col p-12 justify-start">
           <div className="flex items-center gap-4 mb-32">
             <h1 className="font-headline text-3xl font-bold text-white tracking-tight">Safira</h1>
-            <div className="h-4 w-[1px] bg-white/40"></div>
+            <div className="h-4 w-[1px] bg-card/40"></div>
             <span className="font-label text-xs text-white/80 uppercase tracking-widest">Your Safety. Our Priority.</span>
           </div>
 
@@ -164,27 +165,27 @@ export default function Login() {
               A sanctuary in<br />your pocket.
             </h2>
             <p className="font-body text-lg text-white/90 leading-relaxed max-w-sm mb-8">
-              Trusted by 10,000+ women traveling solo across India's vibrant landscapes.
+              Safety tools and trusted connections for your journeys.
             </p>
 
             <div className="flex flex-wrap gap-3">
-              {['50+ Cities', '24/7 Support', '112 Connected'].map((pill, i) => (
-                <div key={i} className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center gap-2">
+              {['Safety map', 'SOS tools', 'Trusted contacts'].map((pill, i) => (
+                <div key={i} className="px-4 py-2 rounded-full bg-card/10 backdrop-blur-md border border-line/60 flex items-center gap-2">
                   <span className="font-label text-xs font-bold text-white uppercase tracking-wider">{pill}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-[20px] p-6 rounded-2xl border border-white/20 max-w-sm ml-auto shadow-2xl">
-            <div className="flex gap-0.5 text-[#f0e8c8] mb-3">
+          <div className="bg-card/10 backdrop-blur-[20px] p-6 rounded-2xl border border-line/60 max-w-sm ml-auto shadow-2xl">
+            <div className="flex gap-0.5 text-warning mb-3">
               {[1, 2, 3, 4, 5].map(i => <span key={i} className="material-symbols-outlined text-lg material-symbols-fill">star</span>)}
             </div>
             <p className="font-body italic text-sm text-white mb-5 leading-relaxed">
               "The Guardian Shield feature gave me the confidence to explore Jaipur alone at dusk. Truly a lifesaver app."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border-2 border-white/30 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3k-g5onhN-SOg7bUMKf7GwwuE02Z0cK1UklkHj1zFUqAmcffTOlYj27xLAmjS_4Nyxta4Jx23CrUo1DNRkNKWxd8VBuTWhX0TE3QT4oV3IioYrQiV2y28b0wMfteC78RmbkH9EJKLvhqlN3dAQ34Zkt-RPDVSbBetRV3-6oAo2VJH10ZPjScyw7fyQj_dwD2VoEK1r3fD0HuE4CisbBenxYwKT0OQ2OZf0mG0r3yTRAaFgrfmm0yFTkG0H8E0KX0MU6oBdkBiwVLR')] bg-cover"></div>
+              <div className="w-10 h-10 rounded-full border-2 border-line/60 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3k-g5onhN-SOg7bUMKf7GwwuE02Z0cK1UklkHj1zFUqAmcffTOlYj27xLAmjS_4Nyxta4Jx23CrUo1DNRkNKWxd8VBuTWhX0TE3QT4oV3IioYrQiV2y28b0wMfteC78RmbkH9EJKLvhqlN3dAQ34Zkt-RPDVSbBetRV3-6oAo2VJH10ZPjScyw7fyQj_dwD2VoEK1r3fD0HuE4CisbBenxYwKT0OQ2OZf0mG0r3yTRAaFgrfmm0yFTkG0H8E0KX0MU6oBdkBiwVLR')] bg-cover"></div>
               <div>
                 <p className="font-label text-sm font-bold text-white">Priya Sharma</p>
                 <p className="font-label text-[11px] text-white/60 uppercase tracking-widest">Solo Traveler</p>

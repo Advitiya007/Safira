@@ -48,7 +48,7 @@ export default function PricingSection() {
                                 }`}
                         >
                             {p.badge && (
-                                <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 font-label text-xs uppercase tracking-widest font-bold px-4 py-1.5 rounded-full shadow-sm z-10 whitespace-nowrap ${p.variant === 'primary' ? 'bg-surface text-primary' : 'bg-primary text-white'
+                                <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 font-label text-xs uppercase tracking-widest font-bold px-4 py-1.5 rounded-full shadow-sm z-10 whitespace-nowrap ${p.variant === 'primary' ? 'bg-surface text-primary' : 'bg-primary-container text-white'
                                     }`}>
                                     {p.badge}
                                 </div>
@@ -71,7 +71,7 @@ export default function PricingSection() {
                             <Link
                                 to={ROUTES.SIGNUP}
                                 className={`w-full font-label font-bold py-4 px-8 rounded-lg text-lg text-center transition-all duration-200 ${p.variant === 'primary'
-                                        ? 'bg-white text-primary shadow-3d-primary active:translate-y-[2px] active:shadow-none'
+                                        ? 'bg-card text-primary shadow-3d-primary active:translate-y-[2px] active:shadow-none'
                                         : 'bg-surface-container-high text-primary hover:bg-surface-variant border border-outline-variant/15'
                                     }`}
                             >

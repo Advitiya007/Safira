@@ -15,30 +15,30 @@ const createIcon = (type) => {
     const t = type?.toLowerCase() || '';
     let bgColor, iconName, colorClass;
     if (t === 'police') {
-        bgColor = 'bg-blue-100 border-blue-200';
+        bgColor = 'bg-info/10 border-info/20';
         iconName = 'shield';
-        colorClass = 'text-[#4B7FBE]';
+        colorClass = 'text-info';
     } else if (t === 'hospital') {
-        bgColor = 'bg-red-100 border-red-200';
+        bgColor = 'bg-error/10 border-error/20';
         iconName = 'local_hospital';
-        colorClass = 'text-[#DC2626]';
+        colorClass = 'text-error';
     } else if (t === 'pharmacy') {
-        bgColor = 'bg-green-100 border-green-200';
+        bgColor = 'bg-success/10 border-success/20';
         iconName = 'medical_services';
-        colorClass = 'text-[#15803D]';
+        colorClass = 'text-success';
     } else if (t === 'public transport') {
-        bgColor = 'bg-sky-100 border-sky-200';
+        bgColor = 'bg-info/10 border-info/20';
         iconName = 'train';
-        colorClass = 'text-[#0369A1]';
+        colorClass = 'text-info';
     } else if (t === 'mapped establishment') {
-        bgColor = 'bg-amber-100 border-amber-200';
+        bgColor = 'bg-warning/10 border-warning/20';
         iconName = 'storefront';
-        colorClass = 'text-[#B45309]';
+        colorClass = 'text-warning';
     } else {
         // Safezone / Crowd
-        bgColor = 'bg-[#8B4A6A]/10 border-[#8B4A6A]/20';
+        bgColor = 'bg-primary-container/10 border-primary-container/20';
         iconName = 'home';
-        colorClass = 'text-[#8B4A6A]';
+        colorClass = 'text-primary-container';
     }
 
     return new L.DivIcon({
@@ -56,8 +56,8 @@ const userIcon = new L.DivIcon({
     className: 'custom-leaflet-marker',
     html: `<div class="relative flex items-center justify-center w-12 h-12">
     <div class="absolute w-12 h-12 bg-primary/20 rounded-full animate-ping"></div>
-    <div class="w-7 h-7 rounded-full bg-white shadow-lg flex items-center justify-center z-10 border-2 border-[#8B4A6A]">
-      <div class="w-3.5 h-3.5 rounded-full bg-[#8B4A6A]"></div>
+    <div class="w-7 h-7 rounded-full bg-card shadow-lg flex items-center justify-center z-10 border-2 border-primary-container">
+      <div class="w-3.5 h-3.5 rounded-full bg-primary-container"></div>
     </div>
   </div>`,
     iconSize: [48, 48],
@@ -152,7 +152,7 @@ export default function CustomMapContainer({
                             positions={route.coordinates}
                             bubblingMouseEvents={false}
                             pathOptions={{
-                                color: index === selectedRouteIndex ? '#8B4A6A' : '#687585',
+                                color: index === selectedRouteIndex ? 'rgb(var(--primary-container))' : 'rgb(var(--ink-muted))',
                                 weight: index === selectedRouteIndex ? 7 : 4,
                                 opacity: index === selectedRouteIndex ? 0.95 : 0.6,
                             }}

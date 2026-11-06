@@ -138,21 +138,21 @@ const Signup = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col lg:flex-row overflow-x-hidden">
       {/* Left Side - Hidden on Mobile */}
-      <div className="hidden lg:flex lg:w-2/5 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-2/5 min-h-[100dvh] relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             alt="Indian women traveling safely"
             className="w-full h-full object-cover"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuB939moER2ZG6cduuQx5MFuT6OtAuQ7XaFy9bhrqTAkl-jPIp_h3KTpFAqoC9O9CC7eYaJw3yeQZpmRODkNPfVAa4uWW9WglSV1aOS96FT1aIo_0qO-zFZj708Z0CEUvS2OqXMWABecW4tPQo-1J4YEUaHgmpj2YcVlPMsfkDBeO-J9QHIQYpdHwPrrOvJEAKtxZA6IJEtdRaWsMbpRvAKuKNxY9MI294L4AKWJv-gnpSRJ6_OnEVXnmxs-uwfS8bRr6C1e1haj7dvC"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#3e0021]/90 via-[#3e0021]/60 to-[#3e0021]/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/60 to-ink/40"></div>
         </div>
-        <div className="relative z-10 flex flex-col justify-center items-center text-white p-12 h-full">
+        <div className="relative z-10 flex flex-col justify-center items-center text-white p-6 xl:p-12 min-h-[100dvh]">
           {/* Logo */}
           <div className="text-3xl font-bold font-serif text-white mb-2">Safira</div>
-          <div className="text-xs tracking-widest text-gray-300 mb-12">YOUR SAFETY. OUR PRIORITY</div>
+          <div className="text-xs tracking-widest text-ink-muted mb-12">YOUR SAFETY. OUR PRIORITY</div>
           
           {/* Heading */}
           <h1 className="text-5xl font-bold font-serif text-white leading-tight mb-8 text-center">
@@ -165,7 +165,7 @@ const Signup = () => {
               <span className="material-symbols-outlined text-3xl text-white">notifications_active</span>
               <div>
                 <h3 className="text-white font-semibold text-lg">SOS Alerts</h3>
-                <p className="text-gray-300 text-sm">Instant emergency notifications to your trusted circle with precise location tracking</p>
+                <p className="text-ink-muted text-sm">Instant emergency notifications to your trusted circle with precise location tracking</p>
               </div>
             </div>
             
@@ -173,7 +173,7 @@ const Signup = () => {
               <span className="material-symbols-outlined text-3xl text-white">map</span>
               <div>
                 <h3 className="text-white font-semibold text-lg">Safe Zone Maps</h3>
-                <p className="text-gray-300 text-sm">Navigate confidently with community-verified safe routes and shelter locations</p>
+                <p className="text-ink-muted text-sm">Explore mapped facilities and route options; map coverage can be incomplete.</p>
               </div>
             </div>
             
@@ -181,47 +181,32 @@ const Signup = () => {
               <span className="material-symbols-outlined text-3xl text-white">group</span>
               <div>
                 <h3 className="text-white font-semibold text-lg">Guardian Network</h3>
-                <p className="text-gray-300 text-sm">Connect with verified volunteers and authorities in your immediate vicinity</p>
+                <p className="text-ink-muted text-sm">Manage the trusted contacts you choose to add.</p>
               </div>
             </div>
             
             <div className="flex items-start gap-4">
               <span className="material-symbols-outlined text-3xl text-white">support_agent</span>
               <div>
-                <h3 className="text-white font-semibold text-lg">24/7 Priority Helpline</h3>
-                <p className="text-gray-300 text-sm">Direct access to our dedicated support team and emergency dispatchers at any time</p>
+                <h3 className="text-white font-semibold text-lg">Wellness resources</h3>
+                <p className="text-ink-muted text-sm">Browse wellness guides and current-affairs resources in the app.</p>
               </div>
             </div>
           </div>
           
-          {/* Stats Row */}
-          <div className="flex justify-center gap-12">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">10k+</div>
-              <div className="text-sm text-gray-300">Protected</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">50+</div>
-              <div className="text-sm text-gray-300">Cities</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white">24/7</div>
-              <div className="text-sm text-gray-300">Support</div>
-            </div>
-          </div>
         </div>
       </div>
       
       {/* Right Side - Form Area */}
-      <div className="w-full lg:w-3/5 bg-white h-full overflow-y-auto flex items-center justify-center px-6 py-8 lg:px-12 lg:py-16">
+      <div className="w-full lg:w-3/5 bg-card min-h-[100dvh] flex items-center justify-center px-4 sm:px-6 py-8 lg:px-12 lg:py-16">
         <div className="w-full max-w-xl">
           {/* Progress Bar */}
           <ProgressBar currentStep={currentStep} />
           
           {/* Error Message */}
           {errors.submit && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{errors.submit}</p>
+            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-lg">
+              <p className="text-error text-sm">{errors.submit}</p>
             </div>
           )}
           
