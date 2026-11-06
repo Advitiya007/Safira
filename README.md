@@ -1,4 +1,4 @@
-# 🛡️ SafeHer India
+# 🛡️ Safira
 
 <div align="center">
 
@@ -33,9 +33,10 @@ SafeHer India is more than just an app; it's a digital guardian. Built to addres
 
 ## ✨ Key Features
 
-### 🗺️ Live Safety Map (Safe Havens)
+### 🗺️ Live Safety Map With Route Predictions
 - **Interactive Mapping**: Powered by Leaflet and OpenStreetMap.
-- **Safe Zone Discovery**: Real-time locations of Police Stations, Hospitals, and "Safe Havens" (cafes/shops with high safety ratings).
+- **Safe Zone Discovery**: Real-time locations of Police Stations, Hospital
+-  (cafes/shops with high safety ratings).
 - **Spatial Awareness**: Displays your current coordinates and surroundings instantly.
 
 ### 🚨 SOS Emergency System
@@ -154,11 +155,8 @@ SafeHer India uses a curated color palette designed to evoke a sense of **peace,
 
 ## 👨‍💻 Developer Information
 
-**Built with ❤️ by Priyansh Patel**
-*Coding Gita X Swaminarayn University*
+- **GitHub**: [Advitiya007](https://github.com/Advitiya007)
 
-- **GitHub**: [@PriyanshCG](https://github.com/PriyanshCG)
-- **Email**: priyansh30407@gmail.com
 
 ---
 
