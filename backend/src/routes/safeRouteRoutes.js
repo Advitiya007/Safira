@@ -10,6 +10,10 @@ import {
     listCities,
     locateCity,
 } from '../controllers/safeRouteController.js';
+import {
+    getInfrastructureModel,
+    getRouteInfrastructureProfile,
+} from '../controllers/infrastructureController.js';
 
 const router = express.Router();
 
@@ -24,6 +28,9 @@ router.post('/safe-routes/analyze', verifyToken, (req, res, next) => {
     req.on('aborted', () => controller.abort());
     next();
 }, analyzeRoutes);
+// Infrastructure-cluster profile (unsupervised ML, display only; never changes ranking).
+router.get('/safe-routes/:id/infrastructure', verifyToken, getRouteInfrastructureProfile);
+router.get('/infrastructure/model', verifyToken, getInfrastructureModel);
 router.get('/safe-routes/:id/details', verifyToken, getRouteAnalysisDetails);
 router.get('/safe-routes/:id', verifyToken, getRouteAnalysis);
 

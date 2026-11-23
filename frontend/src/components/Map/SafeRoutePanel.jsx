@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Loader2, MapPin, Route, Search, X } from 'lucide-react';
+import InfrastructureProfile, { InfrastructureProfileNote } from './InfrastructureProfile';
 
 const SCORE_LABELS = {
   nightActivity: 'night-time activity',
@@ -221,6 +222,7 @@ export function SafeRouteAlternatives({
   mode,
   cityName,
   routeMetadata,
+  infrastructure,
 }) {
   return (
     <>
@@ -303,6 +305,7 @@ export function SafeRouteAlternatives({
                       </div>
                     </dl>
                   )}
+                  <InfrastructureProfile infrastructure={infrastructure} routeId={route.id} />
                   {route.rankingReason && (
                     <p className="text-[11px] font-semibold text-primary">{route.rankingReason}</p>
                   )}
@@ -316,6 +319,7 @@ export function SafeRouteAlternatives({
           <p className="text-[10px] leading-relaxed text-ink-muted">
             The mapped-indicator score uses the full mode-specific weights; unknown indicators add no positive evidence and are not treated as proof of danger. Emergency distance is straight-line, not a measure of road-network access. Confidence is separate. This is not a crime-risk prediction or a safety guarantee.
           </p>
+          <InfrastructureProfileNote infrastructure={infrastructure} />
           {routeMetadata?.scoringWeights && (
             <p className="text-[10px] leading-relaxed text-ink-muted">
               Configured indicator weights: {Object.entries(routeMetadata.scoringWeights)

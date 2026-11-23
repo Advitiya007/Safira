@@ -80,6 +80,7 @@ Safira/
 │   │   ├── routes/         # API Endpoints
 │   │   └── services/       # External API Integrations (Overpass)
 │   └── server.js           # Server Entry Point
+├── ml_service/             # Python FastAPI + scikit-learn infrastructure clustering (see ml_service/README.md)
 ├── frontend/               # React Application
 │   ├── src/
 │   │   ├── assets/         # Brand Illustrations & PNGs
@@ -119,7 +120,10 @@ npm install
 npm run dev
 ```
 
-### 3. Frontend Configuration
+### 3. Optional: ML infrastructure service
+See [`ml_service/README.md`](ml_service/README.md). Without it the app works exactly as before.
+
+### 4. Frontend Configuration
 ```bash
 cd ../frontend
 npm install
@@ -141,6 +145,7 @@ Safira  uses a curated color palette designed to evoke a sense of **peace, trust
 - [x] Multi-step Secure Onboarding
 - [x] Live Location Streaming
 - [x] SOS Alert Orchestration
+- [x] Unsupervised ML infrastructure profiles for routes (K-Means over mapped OSM infrastructure; display only, not a safety prediction)
 - [ ] AI-Driven Danger Route Predictions (In Progress)
 - [ ] Fake Call Voice Simulation (UI Ready)
 - [ ] Community Safety Forums

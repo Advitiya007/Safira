@@ -21,6 +21,9 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
 FRONTEND_URL=http://localhost:5173
 CONTACT_ENCRYPTION_KEY=optional-dedicated-base64-encoded-32-byte-key
+# Optional: Python infrastructure-clustering service (see ../ml_service/README.md)
+ML_SERVICE_URL=http://127.0.0.1:8001
+ML_SERVICE_API_KEY=shared-secret-also-set-in-ml_service/.env
 ```
 If `CONTACT_ENCRYPTION_KEY` is not set, contact encryption derives a separate key
 from the existing `JWT_SECRET` so deployments that have not added a new secret do
@@ -133,6 +136,20 @@ Endpoints:
   and stores an analysis.
 - `GET /api/safe-routes/:id` and `GET /api/safe-routes/:id/details` (JWT required):
   retrieve only the signed-in user's saved analysis.
+
+#### Infrastructure profile (unsupervised ML, display only)
+
+- `GET /api/safe-routes/:id/infrastructure` (JWT required): for the signed-in user's saved
+  analysis, returns how much of each route passes through each infrastructure cluster
+  (K-Means over mapped road-segment features, produced by `ml_service/`).
+- `GET /api/infrastructure/model` (JWT required): active model version, cluster profiles,
+  metrics and per-city segment coverage.
+
+These endpoints are additive and read-only. They never change route scores, confidence,
+ranking, recommendations or the `RouteAnalysis` document. If `ML_SERVICE_URL` /
+`ML_SERVICE_API_KEY` are not set, the ML service is down, or no model is trained, the API
+returns `200` with `{ available: false, reason }` and Safe Route works unchanged.
+Clusters describe mapped infrastructure only; they are not crime predictions or safety ratings.
 
 The older `POST /api/locations/route-safety` endpoint is retained for existing
 clients, but the Safe Route UI uses the persisted-data analyzer above.

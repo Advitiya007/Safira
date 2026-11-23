@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+# Generated data: regenerate with `python -m safira_ml.cli extract`
+data/*.csv
+data/*.csv.tmp
+# Trained models are deployment artifacts. Remove the next line only if you decide to commit
+# a specific reviewed model version (joblib files are pickle: only load ones you trust).
+models/*/
+reports/*.png

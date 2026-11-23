@@ -136,6 +136,9 @@ export const safeRouteAPI = {
   }),
   getAnalysis: (id, signal) => apiRequest(`/safe-routes/${id}`, { signal }),
   getAnalysisDetails: (id, signal) => apiRequest(`/safe-routes/${id}/details`, { signal }),
+  // Unsupervised infrastructure-cluster profile (display only; never affects ranking).
+  getInfrastructure: (id, signal) => apiRequest(`/safe-routes/${id}/infrastructure`, { signal }),
+  getInfrastructureModel: (signal) => apiRequest('/infrastructure/model', { signal }),
 };
 
 export default apiRequest;

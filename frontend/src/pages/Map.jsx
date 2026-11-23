@@ -51,6 +51,7 @@ export default function MapPage() {
   const [mode, setMode] = useState('walking');
   const [departureTime, setDepartureTime] = useState(getLocalDateTime);
   const [routeMetadata, setRouteMetadata] = useState(null);
+  const [infrastructure, setInfrastructure] = useState(null);
   const [routes, setRoutes] = useState([]);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(null);
   const [recommendedRouteIndex, setRecommendedRouteIndex] = useState(null);
@@ -222,6 +223,28 @@ const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
     setRouteError('');
     setIsRouting(false);
   };
+
+  // Unsupervised infrastructure-cluster profile. Fetched AFTER the analysis is shown, never
+  // blocks it, and is display-only: it cannot change scores, confidence or ranking.
+  const analysisId = routeMetadata?.analysisId;
+  useEffect(() => {
+    if (!analysisId) return undefined;
+    const controller = new AbortController();
+    safeRouteAPI.getInfrastructure(analysisId, controller.signal)
+      .then((response) => {
+        const data = response?.data;
+        setInfrastructure({ analysisId, status: data?.available ? 'ready' : 'unavailable', data });
+      })
+      .catch((requestError) => {
+        if (requestError.name !== 'AbortError') {
+          setInfrastructure({ analysisId, status: 'unavailable', data: { reason: 'service_unavailable' } });
+        }
+      });
+    return () => controller.abort();
+  }, [analysisId]);
+  const currentInfrastructure = analysisId
+    ? (infrastructure?.analysisId === analysisId ? infrastructure : { analysisId, status: 'loading' })
+    : null;
 
   const selectedRoute = selectedRouteIndex === null ? null : routes[selectedRouteIndex];
   const selectedCity = cities.find((city) => city.cityId === cityId);
@@ -426,6 +449,7 @@ const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
             mode={mode}
             cityName={selectedCity?.name}
             routeMetadata={routeMetadata}
+            infrastructure={currentInfrastructure}
           />
 
           <div className="flex items-center justify-between">
