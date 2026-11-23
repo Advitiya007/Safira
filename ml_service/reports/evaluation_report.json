@@ -1,0 +1,735 @@
+{
+  "cities": [
+    "bathinda",
+    "delhi",
+    "jalandhar"
+  ],
+  "disclaimer": "Clusters describe the availability and spatial distribution of mapped OpenStreetMap infrastructure. They are not crime predictions, do not measure safety, and a missing mapped feature is not proof that it does not exist.",
+  "perCity": {
+    "bathinda": {
+      "modelVersion": "bathinda-k2-20261123190543-9f0b5220",
+      "k": 2,
+      "kSelection": {
+        "method": "max silhouette among k with min cluster fraction >= 2%",
+        "silhouetteChoice": 2,
+        "elbowChoice": 5
+      },
+      "kTable": [
+        {
+          "k": 2,
+          "inertia": 132936.79421,
+          "silhouette": 0.42052,
+          "davies_bouldin": 1.38887,
+          "min_cluster_fraction": 0.26757
+        },
+        {
+          "k": 3,
+          "inertia": 109394.87561,
+          "silhouette": 0.38405,
+          "davies_bouldin": 1.24874,
+          "min_cluster_fraction": 0.05322
+        },
+        {
+          "k": 4,
+          "inertia": 88846.60367,
+          "silhouette": 0.36806,
+          "davies_bouldin": 1.08131,
+          "min_cluster_fraction": 0.03652
+        },
+        {
+          "k": 5,
+          "inertia": 72833.35111,
+          "silhouette": 0.3679,
+          "davies_bouldin": 0.9337,
+          "min_cluster_fraction": 0.01066
+        },
+        {
+          "k": 6,
+          "inertia": 62605.03595,
+          "silhouette": 0.26581,
+          "davies_bouldin": 1.0662,
+          "min_cluster_fraction": 0.01066
+        },
+        {
+          "k": 7,
+          "inertia": 54164.91796,
+          "silhouette": 0.28899,
+          "davies_bouldin": 1.03016,
+          "min_cluster_fraction": 0.01066
+        },
+        {
+          "k": 8,
+          "inertia": 48939.53971,
+          "silhouette": 0.29392,
+          "davies_bouldin": 1.03687,
+          "min_cluster_fraction": 0.01066
+        },
+        {
+          "k": 9,
+          "inertia": 44651.69338,
+          "silhouette": 0.29396,
+          "davies_bouldin": 1.01396,
+          "min_cluster_fraction": 0.01049
+        },
+        {
+          "k": 10,
+          "inertia": 42505.07335,
+          "silhouette": 0.2843,
+          "davies_bouldin": 1.06824,
+          "min_cluster_fraction": 0.01049
+        }
+      ],
+      "metrics": {
+        "silhouette": 0.4206014981325531,
+        "silhouetteSampleSize": 10000,
+        "daviesBouldin": 1.388879089789937,
+        "inertia": 132936.74180322836,
+        "stability": {
+          "meanARI": 0.9955816417845502,
+          "minARI": 0.9851252196312215,
+          "runs": 5
+        }
+      },
+      "droppedFeatures": {
+        "foot_access": "observed for only 0% of segments in bathinda (minimum 60%)",
+        "vehicle_access": "observed for only 1% of segments in bathinda (minimum 60%)",
+        "sidewalk_present": "observed for only 0% of segments in bathinda (minimum 60%)"
+      },
+      "featuresUsed": [
+        "length_m",
+        "police_count",
+        "police_nearest_m",
+        "hospital_count",
+        "hospital_nearest_m",
+        "pharmacy_count",
+        "pharmacy_nearest_m",
+        "shop_count",
+        "transport_count",
+        "establishment_density_per_km2"
+      ],
+      "training": {
+        "cities": [
+          "bathinda"
+        ],
+        "segmentsAfterCleaning": 18018,
+        "segmentsUsedForFitting": 18018,
+        "segmentsByCityUsed": {
+          "bathinda": 18018
+        },
+        "exclusions": {
+          "input": 19770,
+          "duplicates": 0,
+          "short": 1752,
+          "kept": 18018
+        },
+        "sourceDataVersions": []
+      },
+      "clusters": [
+        {
+          "clusterId": 0,
+          "name": "Infrastructure-sparse \u00b7 mostly local streets",
+          "size": 13198,
+          "share": 0.7325,
+          "serviceIndex": -0.32197570685342075,
+          "cityShares": {
+            "bathinda": 1.0
+          }
+        },
+        {
+          "clusterId": 1,
+          "name": "Infrastructure-rich \u00b7 mostly local streets",
+          "size": 4820,
+          "share": 0.2675,
+          "serviceIndex": 0.8796312289553998,
+          "cityShares": {
+            "bathinda": 1.0
+          }
+        }
+      ]
+    },
+    "delhi": {
+      "modelVersion": "delhi-k2-20261123190600-94a15eff",
+      "k": 2,
+      "kSelection": {
+        "method": "max silhouette among k with min cluster fraction >= 2%",
+        "silhouetteChoice": 2,
+        "elbowChoice": 5
+      },
+      "kTable": [
+        {
+          "k": 2,
+          "inertia": 166949.38208,
+          "silhouette": 0.23972,
+          "davies_bouldin": 1.71516,
+          "min_cluster_fraction": 0.27295
+        },
+        {
+          "k": 3,
+          "inertia": 142863.0637,
+          "silhouette": 0.17235,
+          "davies_bouldin": 1.73967,
+          "min_cluster_fraction": 0.1848
+        },
+        {
+          "k": 4,
+          "inertia": 130100.31899,
+          "silhouette": 0.1549,
+          "davies_bouldin": 1.88919,
+          "min_cluster_fraction": 0.14415
+        },
+        {
+          "k": 5,
+          "inertia": 121331.5302,
+          "silhouette": 0.1535,
+          "davies_bouldin": 1.83606,
+          "min_cluster_fraction": 0.12815
+        },
+        {
+          "k": 6,
+          "inertia": 114794.65672,
+          "silhouette": 0.14035,
+          "davies_bouldin": 1.83659,
+          "min_cluster_fraction": 0.0827
+        },
+        {
+          "k": 7,
+          "inertia": 109702.53198,
+          "silhouette": 0.13529,
+          "davies_bouldin": 1.86672,
+          "min_cluster_fraction": 0.0779
+        },
+        {
+          "k": 8,
+          "inertia": 105824.63013,
+          "silhouette": 0.13541,
+          "davies_bouldin": 1.81593,
+          "min_cluster_fraction": 0.06565
+        },
+        {
+          "k": 9,
+          "inertia": 102608.16189,
+          "silhouette": 0.12692,
+          "davies_bouldin": 1.8771,
+          "min_cluster_fraction": 0.06345
+        },
+        {
+          "k": 10,
+          "inertia": 99564.48953,
+          "silhouette": 0.12651,
+          "davies_bouldin": 1.88783,
+          "min_cluster_fraction": 0.04845
+        }
+      ],
+      "metrics": {
+        "silhouette": 0.23971510957151226,
+        "silhouetteSampleSize": 10000,
+        "daviesBouldin": 1.715164770922319,
+        "inertia": 166949.3820849793,
+        "stability": {
+          "meanARI": 0.9639648449897216,
+          "minARI": 0.9246639004907921,
+          "runs": 5
+        }
+      },
+      "droppedFeatures": {
+        "foot_access": "observed for only 1% of segments in delhi (minimum 60%)",
+        "vehicle_access": "observed for only 0% of segments in delhi (minimum 60%)",
+        "sidewalk_present": "observed for only 4% of segments in delhi (minimum 60%)"
+      },
+      "featuresUsed": [
+        "length_m",
+        "police_count",
+        "police_nearest_m",
+        "hospital_count",
+        "hospital_nearest_m",
+        "pharmacy_count",
+        "pharmacy_nearest_m",
+        "shop_count",
+        "transport_count",
+        "establishment_density_per_km2"
+      ],
+      "training": {
+        "cities": [
+          "delhi"
+        ],
+        "segmentsAfterCleaning": 30610,
+        "segmentsUsedForFitting": 20000,
+        "segmentsByCityUsed": {
+          "delhi": 20000
+        },
+        "exclusions": {
+          "input": 38000,
+          "duplicates": 0,
+          "short": 7390,
+          "kept": 30610
+        },
+        "sourceDataVersions": []
+      },
+      "clusters": [
+        {
+          "clusterId": 0,
+          "name": "Infrastructure-sparse \u00b7 mostly local streets",
+          "size": 14541,
+          "share": 0.727,
+          "serviceIndex": -0.28664967135422076,
+          "cityShares": {
+            "delhi": 1.0
+          }
+        },
+        {
+          "clusterId": 1,
+          "name": "Infrastructure-rich \u00b7 dense mapped establishments",
+          "size": 5459,
+          "share": 0.273,
+          "serviceIndex": 0.7645042390022853,
+          "cityShares": {
+            "delhi": 1.0
+          }
+        }
+      ]
+    },
+    "jalandhar": {
+      "modelVersion": "jalandhar-k5-20261123190618-27491918",
+      "k": 5,
+      "kSelection": {
+        "method": "max silhouette among k with min cluster fraction >= 2%",
+        "silhouetteChoice": 5,
+        "elbowChoice": 6
+      },
+      "kTable": [
+        {
+          "k": 2,
+          "inertia": 164998.31306,
+          "silhouette": 0.25096,
+          "davies_bouldin": 1.47408,
+          "min_cluster_fraction": 0.468
+        },
+        {
+          "k": 3,
+          "inertia": 137595.77262,
+          "silhouette": 0.27325,
+          "davies_bouldin": 1.23253,
+          "min_cluster_fraction": 0.02245
+        },
+        {
+          "k": 4,
+          "inertia": 113886.48078,
+          "silhouette": 0.31729,
+          "davies_bouldin": 1.27569,
+          "min_cluster_fraction": 0.02765
+        },
+        {
+          "k": 5,
+          "inertia": 95195.15709,
+          "silhouette": 0.33432,
+          "davies_bouldin": 1.16623,
+          "min_cluster_fraction": 0.02035
+        },
+        {
+          "k": 6,
+          "inertia": 78157.03195,
+          "silhouette": 0.3448,
+          "davies_bouldin": 0.92464,
+          "min_cluster_fraction": 0.01065
+        },
+        {
+          "k": 7,
+          "inertia": 68837.5209,
+          "silhouette": 0.25271,
+          "davies_bouldin": 0.96369,
+          "min_cluster_fraction": 0.01065
+        },
+        {
+          "k": 8,
+          "inertia": 61930.61185,
+          "silhouette": 0.2648,
+          "davies_bouldin": 0.98451,
+          "min_cluster_fraction": 0.00795
+        },
+        {
+          "k": 9,
+          "inertia": 58369.66531,
+          "silhouette": 0.24047,
+          "davies_bouldin": 1.11229,
+          "min_cluster_fraction": 0.01065
+        },
+        {
+          "k": 10,
+          "inertia": 51720.80592,
+          "silhouette": 0.25088,
+          "davies_bouldin": 1.09525,
+          "min_cluster_fraction": 0.00795
+        }
+      ],
+      "metrics": {
+        "silhouette": 0.3305694138812549,
+        "silhouetteSampleSize": 10000,
+        "daviesBouldin": 0.9933687744769129,
+        "inertia": 94788.29876771124,
+        "stability": {
+          "meanARI": 0.9550722744543132,
+          "minARI": 0.895015628396539,
+          "runs": 5
+        }
+      },
+      "droppedFeatures": {
+        "foot_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+        "vehicle_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+        "sidewalk_present": "observed for only 1% of segments in jalandhar (minimum 60%)"
+      },
+      "featuresUsed": [
+        "length_m",
+        "police_count",
+        "police_nearest_m",
+        "hospital_count",
+        "hospital_nearest_m",
+        "pharmacy_count",
+        "pharmacy_nearest_m",
+        "shop_count",
+        "transport_count",
+        "establishment_density_per_km2"
+      ],
+      "training": {
+        "cities": [
+          "jalandhar"
+        ],
+        "segmentsAfterCleaning": 54921,
+        "segmentsUsedForFitting": 20000,
+        "segmentsByCityUsed": {
+          "jalandhar": 20000
+        },
+        "exclusions": {
+          "input": 61743,
+          "duplicates": 0,
+          "short": 6822,
+          "kept": 54921
+        },
+        "sourceDataVersions": []
+      },
+      "clusters": [
+        {
+          "clusterId": 0,
+          "name": "Infrastructure-sparse \u00b7 mostly local streets",
+          "size": 8569,
+          "share": 0.4284,
+          "serviceIndex": -0.4289561224666011,
+          "cityShares": {
+            "jalandhar": 1.0
+          }
+        },
+        {
+          "clusterId": 1,
+          "name": "Infrastructure-rich \u00b7 mostly local streets",
+          "size": 364,
+          "share": 0.0182,
+          "serviceIndex": 1.5960631378095471,
+          "cityShares": {
+            "jalandhar": 1.0
+          }
+        },
+        {
+          "clusterId": 2,
+          "name": "Moderate infrastructure \u00b7 mostly local streets",
+          "size": 9992,
+          "share": 0.4996,
+          "serviceIndex": 0.1717482762750212,
+          "cityShares": {
+            "jalandhar": 1.0
+          }
+        },
+        {
+          "clusterId": 3,
+          "name": "Moderate infrastructure \u00b7 mostly local streets (cluster 3)",
+          "size": 553,
+          "share": 0.0277,
+          "serviceIndex": 1.0000510215492069,
+          "cityShares": {
+            "jalandhar": 1.0
+          }
+        },
+        {
+          "clusterId": 4,
+          "name": "Moderate infrastructure \u00b7 mostly local streets (cluster 4)",
+          "size": 522,
+          "share": 0.0261,
+          "serviceIndex": 1.5712925291345021,
+          "cityShares": {
+            "jalandhar": 1.0
+          }
+        }
+      ]
+    }
+  },
+  "plots": [
+    "k_selection_bathinda.png",
+    "pca_bathinda.png",
+    "profiles_bathinda.png",
+    "k_selection_delhi.png",
+    "pca_delhi.png",
+    "profiles_delhi.png",
+    "k_selection_jalandhar.png",
+    "pca_jalandhar.png",
+    "profiles_jalandhar.png",
+    "k_selection_global.png",
+    "pca_global.png",
+    "profiles_global.png",
+    "cluster_city_composition.png"
+  ],
+  "global": {
+    "modelVersion": "global-k2-20261123190638-b88953ab",
+    "k": 2,
+    "kSelection": {
+      "method": "max silhouette among k with min cluster fraction >= 2%",
+      "silhouetteChoice": 2,
+      "elbowChoice": 4
+    },
+    "kTable": [
+      {
+        "k": 2,
+        "inertia": 421092.30505,
+        "silhouette": 0.35843,
+        "davies_bouldin": 1.40602,
+        "min_cluster_fraction": 0.31227
+      },
+      {
+        "k": 3,
+        "inertia": 340782.23683,
+        "silhouette": 0.26404,
+        "davies_bouldin": 1.41955,
+        "min_cluster_fraction": 0.13953
+      },
+      {
+        "k": 4,
+        "inertia": 298161.26815,
+        "silhouette": 0.24811,
+        "davies_bouldin": 1.56549,
+        "min_cluster_fraction": 0.07022
+      },
+      {
+        "k": 5,
+        "inertia": 271347.9905,
+        "silhouette": 0.25252,
+        "davies_bouldin": 1.54609,
+        "min_cluster_fraction": 0.05814
+      },
+      {
+        "k": 6,
+        "inertia": 252142.14391,
+        "silhouette": 0.19873,
+        "davies_bouldin": 1.53147,
+        "min_cluster_fraction": 0.05767
+      },
+      {
+        "k": 7,
+        "inertia": 235414.36606,
+        "silhouette": 0.20384,
+        "davies_bouldin": 1.50426,
+        "min_cluster_fraction": 0.0319
+      },
+      {
+        "k": 8,
+        "inertia": 224367.68414,
+        "silhouette": 0.20337,
+        "davies_bouldin": 1.51429,
+        "min_cluster_fraction": 0.03097
+      },
+      {
+        "k": 9,
+        "inertia": 214038.52887,
+        "silhouette": 0.20655,
+        "davies_bouldin": 1.48025,
+        "min_cluster_fraction": 0.04071
+      },
+      {
+        "k": 10,
+        "inertia": 204836.36668,
+        "silhouette": 0.19697,
+        "davies_bouldin": 1.55054,
+        "min_cluster_fraction": 0.02849
+      }
+    ],
+    "metrics": {
+      "silhouette": 0.35620185140555594,
+      "silhouetteSampleSize": 10000,
+      "daviesBouldin": 1.4074105922849718,
+      "inertia": 421091.7372349773,
+      "stability": {
+        "meanARI": 0.985302246538415,
+        "minARI": 0.977635347845535,
+        "runs": 5
+      },
+      "clusterCityNMI": 0.2831948589066382
+    },
+    "droppedFeatures": {
+      "foot_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+      "vehicle_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+      "sidewalk_present": "observed for only 0% of segments in bathinda (minimum 60%)"
+    },
+    "featuresUsed": [
+      "length_m",
+      "police_count",
+      "police_nearest_m",
+      "hospital_count",
+      "hospital_nearest_m",
+      "pharmacy_count",
+      "pharmacy_nearest_m",
+      "shop_count",
+      "transport_count",
+      "establishment_density_per_km2"
+    ],
+    "training": {
+      "cities": [
+        "bathinda",
+        "delhi",
+        "jalandhar"
+      ],
+      "segmentsAfterCleaning": 103549,
+      "segmentsUsedForFitting": 58018,
+      "segmentsByCityUsed": {
+        "bathinda": 18018,
+        "delhi": 20000,
+        "jalandhar": 20000
+      },
+      "exclusions": {
+        "input": 119513,
+        "duplicates": 0,
+        "short": 15964,
+        "kept": 103549
+      },
+      "sourceDataVersions": []
+    },
+    "clusters": [
+      {
+        "clusterId": 0,
+        "name": "Infrastructure-rich \u00b7 mostly local streets",
+        "size": 18404,
+        "share": 0.3172,
+        "serviceIndex": 0.864118692957339,
+        "cityShares": {
+          "delhi": 0.813,
+          "bathinda": 0.146,
+          "jalandhar": 0.041
+        }
+      },
+      {
+        "clusterId": 1,
+        "name": "Infrastructure-sparse \u00b7 mostly local streets",
+        "size": 39614,
+        "share": 0.6828,
+        "serviceIndex": -0.40257420802548577,
+        "cityShares": {
+          "jalandhar": 0.486,
+          "bathinda": 0.387,
+          "delhi": 0.127
+        }
+      }
+    ],
+    "cityComposition": {
+      "bathinda": {
+        "Infrastructure-rich \u00b7 mostly local streets": 0.1495,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.8505
+      },
+      "delhi": {
+        "Infrastructure-rich \u00b7 mostly local streets": 0.7479,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.2521
+      },
+      "jalandhar": {
+        "Infrastructure-rich \u00b7 mostly local streets": 0.0376,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.9624
+      }
+    },
+    "varianceExplainedByCity": {
+      "length_m": 0.0563,
+      "police_count": 0.2922,
+      "police_nearest_m": 0.3885,
+      "hospital_count": 0.0814,
+      "hospital_nearest_m": 0.1345,
+      "pharmacy_count": 0.3693,
+      "pharmacy_nearest_m": 0.5291,
+      "shop_count": 0.1429,
+      "transport_count": 0.1908,
+      "establishment_density_per_km2": 0.2195,
+      "road_group__major": 0.0097,
+      "road_group__secondary_tertiary": 0.0556,
+      "road_group__local": 0.049,
+      "road_group__service": 0.0061,
+      "road_group__pedestrian_path": 0.0109
+    }
+  },
+  "leaveOneCityOut": [
+    {
+      "heldOutCity": "bathinda",
+      "trainedOn": [
+        "delhi",
+        "jalandhar"
+      ],
+      "modelVersion": "global-k2-20261123190656-c52d2a33",
+      "k": 2,
+      "heldOutSegments": 18018,
+      "heldOutSilhouette": 0.4157982372881066,
+      "trainSilhouette": 0.31892354508470444,
+      "meanDistanceRatio": 0.964854346797972,
+      "shareAboveTrainP99": 0.0009435009435009435,
+      "imputedValueFraction": 0.0,
+      "clusterShares": {
+        "Infrastructure-rich \u00b7 mostly local streets": 0.1171,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.8829
+      },
+      "agreementWithCityOwnModel": {
+        "adjustedRand": 0.4146372809525603,
+        "normalizedMutualInfo": 0.3774800509865757,
+        "note": "Cluster counts can differ between the two models; ARI/NMI compare partitions only."
+      }
+    },
+    {
+      "heldOutCity": "delhi",
+      "trainedOn": [
+        "bathinda",
+        "jalandhar"
+      ],
+      "modelVersion": "global-k4-20261123190715-2962a0cd",
+      "k": 4,
+      "heldOutSegments": 30610,
+      "heldOutSilhouette": 0.016916775097559976,
+      "trainSilhouette": 0.3037056217910159,
+      "meanDistanceRatio": 4.861812837305136,
+      "shareAboveTrainP99": 0.5012740934335185,
+      "imputedValueFraction": 0.0,
+      "clusterShares": {
+        "Moderate infrastructure \u00b7 mostly local streets": 0.2863,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.0433,
+        "Moderate infrastructure \u00b7 mostly local streets (cluster 2)": 0.1244,
+        "Infrastructure-rich \u00b7 mostly local streets": 0.546
+      },
+      "agreementWithCityOwnModel": {
+        "adjustedRand": 0.02010090582510187,
+        "normalizedMutualInfo": 0.1609680216252379,
+        "note": "Cluster counts can differ between the two models; ARI/NMI compare partitions only."
+      }
+    },
+    {
+      "heldOutCity": "jalandhar",
+      "trainedOn": [
+        "bathinda",
+        "delhi"
+      ],
+      "modelVersion": "global-k2-20261123190734-465a6709",
+      "k": 2,
+      "heldOutSegments": 54921,
+      "heldOutSilhouette": 0.30043429293550133,
+      "trainSilhouette": 0.28368665529483666,
+      "meanDistanceRatio": 0.8280752046518417,
+      "shareAboveTrainP99": 0.0,
+      "imputedValueFraction": 0.0,
+      "clusterShares": {
+        "Infrastructure-rich \u00b7 mostly local streets": 0.1252,
+        "Infrastructure-sparse \u00b7 mostly local streets": 0.8748
+      },
+      "agreementWithCityOwnModel": {
+        "adjustedRand": 0.11286563421486336,
+        "normalizedMutualInfo": 0.18957263431479088,
+        "note": "Cluster counts can differ between the two models; ARI/NMI compare partitions only."
+      }
+    }
+  ]
+}
