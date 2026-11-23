@@ -120,6 +120,19 @@ is unset they refuse to serve (fail closed).
 Interactive docs at `http://127.0.0.1:8001/docs` when running locally.
 Generate/train jobs are serialised (a second concurrent job gets HTTP 409).
 
+## Algorithm comparison
+
+K-Means was chosen as the starting point, then benchmarked against nine alternatives (MiniBatch and
+Bisecting K-Means, two Gaussian Mixtures, Birch, Ward, Spectral, DBSCAN, HDBSCAN) with identical
+preprocessing and written-down rules (must score new segments from a saved model, must profile every
+segment, must be reproducible, then quality/transfer/city-dependence, simplest wins ties).
+
+```bash
+python -m safira_ml.cli compare            # writes reports/algorithm_comparison.{md,json,png}
+```
+
+Plain-language explanation for presentations: [`ALGORITHM_CHOICE.md`](ALGORITHM_CHOICE.md).
+
 ## Express and UI integration
 
 Set in `backend/.env`:
