@@ -3,6 +3,7 @@
   extract   GeographicFeature -> road segments (road_features.csv and/or RoadSegmentFeature)
   train     fit + save a K-Means model (scope: global or a city id)
   evaluate  city-specific / global / leave-one-city-out evaluation with plots
+  compare   benchmark K-Means against other clustering algorithms
   assign    write cluster assignments into RoadSegmentFeature using the saved model
   serve     run the FastAPI service
 """
@@ -108,6 +109,23 @@ def cmd_evaluate(args) -> int:
     return 0
 
 
+def cmd_compare(args) -> int:
+    from .compare import plot_comparison, render_markdown, run_comparison
+    import json
+    frame, _ = _training_frame(args)
+    out = Path(args.out) if args.out else reports_dir()
+    params = TrainingParams(seed=args.seed, k_max=args.k_max)
+    report = run_comparison(frame, params, args.sample, args.stability_runs,
+                            args.only.split(",") if args.only else None)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "algorithm_comparison.json").write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    (out / "algorithm_comparison.md").write_text(render_markdown(report), encoding="utf-8")
+    plot_comparison(report, out / "algorithm_comparison.png")
+    print(f"recommended: {report['recommended']} - {report['recommendationReason']}")
+    print(f"report written to {out}/algorithm_comparison.md")
+    return 0
+
+
 def cmd_assign(args) -> int:
     from .db import get_database
     from .persistence import load_bundle
@@ -158,6 +176,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--per-city-cap", type=int, default=20000)
     p.add_argument("--seed", type=int, default=42)
     p.set_defaults(func=cmd_evaluate)
+
+    p = sub.add_parser("compare", help="compare K-Means with other clustering algorithms")
+    p.add_argument("--from-csv")
+    p.add_argument("--out")
+    p.add_argument("--k-max", type=int, default=8)
+    p.add_argument("--sample", type=int, default=4000, help="city-balanced rows used (Ward/spectral are O(n^2))")
+    p.add_argument("--stability-runs", type=int, default=4)
+    p.add_argument("--only", help="comma-separated algorithm keys, e.g. kmeans,ward")
+    p.add_argument("--seed", type=int, default=42)
+    p.set_defaults(func=cmd_compare)
 
     p = sub.add_parser("assign", help="write cluster assignments into RoadSegmentFeature")
     p.add_argument("--scope", default="global")

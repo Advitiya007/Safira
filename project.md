@@ -126,3 +126,11 @@ There are NO `police`, `hospital`, `pharmacy`, `shops` categories. Those classes
   Learnings: (a) README pipeline order is log1p -> median impute -> StandardScaler. (b) mongomock lacks `$geoIntersects`; tests use `LocalStore.find_near` (shapely). (c) `/home/claude/Safira` and
   `/home/claude/safira_src/repo` are two clones; work lives in `safira_src/repo` and NOTHING IS COMMITTED (owner never asked) - deliver via tarball or ask before pushing.
   NEXT STEP: owner runs the pipeline on real data (see section 0); then review `evaluation_report.md` together.
+- 2026-11-24: Algorithm comparison DONE. CREATED `ml_service/safira_ml/compare.py` (10 candidates: kmeans, minibatch_kmeans, bisecting_kmeans, gmm_diag, gmm_full, birch, ward, spectral, dbscan, hdbscan;
+  same preprocessing; hard gates = native predict + fidelity>=95%, noise<=5%, stability ARI>=0.6; then mean-rank on silhouette/stability/leave-one-city-out transfer/city NMI/Davies-Bouldin; parsimony rule within 0.03),
+  `ml_service/tests/test_compare.py` (8 tests, 40 total pass), `ml_service/ALGORITHM_CHOICE.md` (plain-language explainer). MODIFIED: `cli.py` (+`compare` command), `ml_service/README.md`.
+  Command: `python -m safira_ml.cli compare [--from-csv ...] [--sample 4000] [--only kmeans,ward]` -> `reports/algorithm_comparison.{md,json,png}`.
+  HONESTY NOTES: (1) I never benchmarked alternatives in the first build - K-Means came from the owner's brief. (2) Demo run used SYNTHETIC data only: it proves the harness works; it does NOT say which algorithm wins on real data.
+  Synthetic demo outcome (not evidence): native-predict gate eliminated Ward/Spectral/DBSCAN/HDBSCAN; DBSCAN/HDBSCAN ~45% noise; K-Means/MiniBatch/Bisecting tied -> K-Means by parsimony.
+  Learnings: shared-axis `invert_yaxis()` called per panel cancels out (call once); DBSCAN silhouette is computed on kept points only so it looks inflated - always show the noise column; sklearn 1.9 HDBSCAN needs `copy=True` to avoid FutureWarning.
+  NEXT STEP: owner runs `compare` on REAL data (after `extract`), reads `reports/algorithm_comparison.md`; if a non-K-Means method clearly wins on all fair metrics, discuss before changing `training.py`.
