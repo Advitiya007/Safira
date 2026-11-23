@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 .env
+.env.example
 # Generated data: regenerate with `python -m safira_ml.cli extract`
 data/*.csv
 data/*.csv.tmp
