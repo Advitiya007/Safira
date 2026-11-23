@@ -1,0 +1,15 @@
+[
+  "road_length_m",
+  "police_count_1km",
+  "nearest_police_dist_m",
+  "hospital_count_1km",
+  "nearest_hospital_dist_m",
+  "pharmacy_count_500m",
+  "nearest_pharmacy_dist_m",
+  "shop_count_250m",
+  "establishment_density_sqkm",
+  "transit_count_500m",
+  "nearest_transit_dist_m",
+  "lighting_signals_count",
+  "road_accessibility_score"
+]
