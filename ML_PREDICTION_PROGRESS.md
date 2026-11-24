@@ -90,7 +90,7 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
 
 - [x] P0 Inspect repo, inventory incident data, write this plan
 - [x] P1 Dynamic city registry (ML side) + tests; keep `test_config_sync` green for built-ins
-- [ ] P2 Incident ingestion: schema, validation, coverage manifest, dedupe, `inspect-incidents` CLI (reports what exists / what is missing)
+- [x] P2 Incident ingestion: schema, validation, coverage manifest, dedupe, `inspect-incidents` CLI (reports what exists / what is missing)
 - [ ] P3 Dataset builder: reuse `road_features.csv`, optional municipal CSV features (streetlights, CCTV), time windows, labels with coverage rule, trainability gate
 - [ ] P4 Supervised training: LR, RF, XGB, LGBM, calibration, baselines, splits (LOCO, spatial, temporal), metrics, report, model card, persistence
 - [ ] P5 FastAPI: `/v1/risk/model`, `/v1/risk/predict` (fail-soft `available:false` until a passing model exists); safety score `(1-p)*100`
@@ -106,4 +106,9 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
   `tests/test_config_sync.py` (compares built-ins to the Node config), `.gitignore` (cities.json, data/incidents/, data/municipal/).
   Tests: ML 55 pass (44 + 11 net new; all existing green). CLI `--city` choices and API validators pick up new cities automatically.
   NOTE: the Node backend still only knows the 3 built-in cities (P6) so a new city also needs P6 + an OSM import before `extract` has data.
+- 2026-11-24 P2 done. CREATED `ml_service/safira_ml/risk/{__init__,config,incidents,coverage,inspect}.py`, `tests/test_risk_incidents.py` (19 tests). MODIFIED `safira_ml/cli.py` (+`inspect-incidents`; exit code 3 when not trainable).
+  Rules implemented: rows are only dropped with a counted reason, never repaired; unmapped categories rejected (category_map.json maps source labels); city assigned from bbox and must agree with any declared city_id;
+  naive timestamps use `naive_timestamps_timezone` and are counted; date-only rows are kept but unusable for band labels; coverage windows need explicit boolean `complete`.
+  Real-state result: `python -m safira_ml.cli inspect-incidents` -> TRAINABLE: NO (no incident dir, no usable incidents, no coverage window). This is the true state of the project.
+  NEXT: P3 dataset builder (labels with coverage rule, time windows, reuse road_features.csv, optional municipal features).
 

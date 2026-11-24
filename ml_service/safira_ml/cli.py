@@ -155,6 +155,14 @@ def cmd_density_map(args) -> int:
     return 0
 
 
+def cmd_inspect_incidents(args) -> int:
+    import json as _json
+    from .risk.inspect import inspect_incident_data, render_text
+    report = inspect_incident_data(Path(args.dir) if args.dir else None)
+    print(_json.dumps(report, indent=2, default=str) if args.json else render_text(report))
+    return 0 if report["trainable"] else 3
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="safira_ml", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -207,6 +215,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--version")
     p.add_argument("--out")
     p.set_defaults(func=cmd_density_map)
+
+    p = sub.add_parser("inspect-incidents", help="report available incident data and what is missing for supervised training")
+    p.add_argument("--dir", help="incident directory (default ml_service/data/incidents)")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_inspect_incidents)
 
     p = sub.add_parser("assign", help="write cluster assignments into RoadSegmentFeature")
     p.add_argument("--scope", default="global")
