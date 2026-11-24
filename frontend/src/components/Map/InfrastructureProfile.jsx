@@ -44,6 +44,7 @@ export default function InfrastructureProfile({ infrastructure, routeId }) {
   if (!profile) return null;
 
   const shares = profile.clusterShares || [];
+  const dominantLevel = data.clusters?.[profile.dominantCluster?.clusterId]?.level || null;
   const matchedPercent = shares.reduce((sum, share) => sum + share.percentOfRoute, 0);
   const notProfiledPercent = Math.max(0, 100 - matchedPercent);
 
@@ -51,8 +52,14 @@ export default function InfrastructureProfile({ infrastructure, routeId }) {
     <div className="space-y-2 rounded-lg border border-line bg-canvas p-2" aria-label="Infrastructure profile">
       <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-ink-muted">
         <Layers className="h-3 w-3" aria-hidden="true" />
-        Infrastructure profile
+        Mapped infrastructure
       </div>
+      {dominantLevel && (
+        <p className="text-[11px] font-semibold text-ink">
+          Largest share: {dominantLevel.toLowerCase()} ({formatPercent(shares[0].percentOfRoute)} of the route)
+          <span className="ml-1 font-normal text-ink-muted">· not a safety rating</span>
+        </p>
+      )}
 
       {shares.length === 0 ? (
         <p className="text-[10px] leading-relaxed text-ink-muted">

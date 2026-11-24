@@ -11,3 +11,9 @@ data/*.csv.tmp
 # a specific reviewed model version (joblib files are pickle: only load ones you trust).
 models/*/
 reports/*.png
+
+# Optional extra cities (see safira_ml/cities.py); a sample lives in cities.example.json
+cities.json
+# Incident data is private/sensitive: never commit it (see ../ML_PREDICTION_PROGRESS.md)
+data/incidents/
+data/municipal/

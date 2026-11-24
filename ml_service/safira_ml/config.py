@@ -10,16 +10,31 @@ import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from .cities import load_cities_file as _load_cities_file
+
 PIPELINE_VERSION = "1.0.0"
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]  # ml_service/
 
-SUPPORTED_CITIES = ("jalandhar", "bathinda", "delhi")
+# Built-in cities. These mirror the Node config and must stay exactly as they are.
+BUILTIN_CITIES = ("jalandhar", "bathinda", "delhi")
 
 # south, west, north, east (degrees) - same keys as the Node config
-CITY_BOUNDING_BOXES = {
+BUILTIN_CITY_BOUNDING_BOXES = {
     "jalandhar": {"south": 31.25, "west": 75.47, "north": 31.42, "east": 75.67},
     "bathinda": {"south": 30.11, "west": 74.83, "north": 30.31, "east": 75.05},
     "delhi": {"south": 28.40, "west": 76.84, "north": 28.88, "east": 77.35},
+}
+
+# Dynamic cities: optional JSON file, see safira_ml/cities.py. Absent file -> exactly the built-ins.
+EXTRA_CITIES_FILE = Path(os.environ.get("SAFIRA_CITIES_FILE", PACKAGE_ROOT / "cities.json"))
+EXTRA_CITIES = _load_cities_file(EXTRA_CITIES_FILE, reserved=BUILTIN_CITIES)
+
+SUPPORTED_CITIES = (*BUILTIN_CITIES, *(city["id"] for city in EXTRA_CITIES))
+CITY_BOUNDING_BOXES = {**BUILTIN_CITY_BOUNDING_BOXES, **{city["id"]: city["bbox"] for city in EXTRA_CITIES}}
+CITY_META = {
+    **{city_id: {"name": city_id.title(), "timezone": "Asia/Kolkata", "builtin": True} for city_id in BUILTIN_CITIES},
+    **{city["id"]: {"name": city["name"], "state": city["state"], "timezone": city["timezone"], "builtin": False}
+       for city in EXTRA_CITIES},
 }
 
 # Mongoose pluralises model names: GeographicFeature -> geographicfeatures,

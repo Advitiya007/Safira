@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from safira_ml.config import CITY_BOUNDING_BOXES, ExtractionParams
+from safira_ml.config import BUILTIN_CITY_BOUNDING_BOXES, ExtractionParams
 
 JS = Path(__file__).resolve().parents[2] / "backend/src/config/safeRouteConfig.js"
 
@@ -12,7 +12,7 @@ def test_bounding_boxes_match_node_config():
     parsed = {}
     for city, body in re.findall(r"(\w+):\s*\{([^}]*)\}", block):
         parsed[city] = {k: float(v) for k, v in re.findall(r"(south|west|north|east):\s*([\d.]+)", body)}
-    assert parsed == CITY_BOUNDING_BOXES
+    assert parsed == BUILTIN_CITY_BOUNDING_BOXES
 
 
 def test_emergency_radius_matches_node_config():

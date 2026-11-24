@@ -74,3 +74,49 @@ export const getRecommendationReview = (route, index, routeMetadata) => {
     reason: route?.rankingReason || null,
   };
 };
+
+// ---- "Mapped help nearby" strip (display only; never feeds score, confidence or ranking) ----
+// Each route segment carries counts of mapped police / hospital+clinic / pharmacy records within
+// the emergency search radius (1 km, straight-line). Zero means "none MAPPED", not "none exist".
+
+const count = (value) => (Number.isFinite(value) && value > 0 ? value : 0);
+
+export const getFacilityStrip = (route) => {
+  const segments = Array.isArray(route?.segments) ? route.segments : [];
+  const cells = segments.map((segment) => {
+    const evidence = segment?.evidence || {};
+    const police = count(evidence.policeCount);
+    const hospital = count(evidence.hospitalCount);
+    const pharmacy = count(evidence.pharmacyCount);
+    return { police, hospital, pharmacy, total: police + hospital + pharmacy, open24x7: count(evidence.open24x7Count) };
+  });
+
+  const facilities = Array.isArray(route?.facilities) ? route.facilities : [];
+  const byType = (type) => facilities.filter((facility) => facility.type === type).length;
+  const knows24x7 = facilities.some((facility) => typeof facility.open24x7 === 'boolean');
+  const emergency = facilities.filter((facility) => ['Police', 'Hospital', 'Clinic', 'Pharmacy'].includes(facility.type));
+
+  return {
+    cells,
+    maxCell: cells.reduce((max, cell) => Math.max(max, cell.total), 0),
+    segmentsWithHelp: cells.filter((cell) => cell.total > 0).length,
+    totals: {
+      police: byType('Police'),
+      hospital: byType('Hospital') + byType('Clinic'),
+      pharmacy: byType('Pharmacy'),
+      // null = this analysis predates the flag, so the 24/7 count is unknown (not zero)
+      open24x7: knows24x7 ? emergency.filter((facility) => facility.open24x7 === true).length : null,
+    },
+  };
+};
+
+// One scale for every route so the colours are comparable between cards.
+export const getSharedStripMax = (routes) => (
+  Math.max(1, ...(routes || []).map((route) => getFacilityStrip(route).maxCell))
+);
+
+// 0 = none mapped; 1..4 = quartile of the shared maximum.
+export const getStripLevel = (total, sharedMax) => {
+  if (!total) return 0;
+  return Math.min(4, Math.max(1, Math.ceil((total / Math.max(1, sharedMax)) * 4)));
+};

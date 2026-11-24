@@ -1,0 +1,11 @@
+{
+  "cities": [
+    {
+      "id": "ludhiana",
+      "name": "Ludhiana",
+      "state": "Punjab",
+      "timezone": "Asia/Kolkata",
+      "bbox": { "south": 30.82, "west": 75.74, "north": 30.97, "east": 75.97 }
+    }
+  ]
+}
