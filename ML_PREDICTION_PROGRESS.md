@@ -91,12 +91,54 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
 - [x] P0 Inspect repo, inventory incident data, write this plan
 - [x] P1 Dynamic city registry (ML side) + tests; keep `test_config_sync` green for built-ins
 - [x] P2 Incident ingestion: schema, validation, coverage manifest, dedupe, `inspect-incidents` CLI (reports what exists / what is missing)
-- [x] P3 Dataset builder: reuse `road_features.csv`, time windows, labels with coverage rule, trainability gate (optional municipal CSV features NOT done: see P3 open issues)
+- [x] P3 Dataset builder (integrated from the Claude 3 bundle, verified 2026-11-24; municipal CSV features NOT done, see 4a)
 - [ ] P4 Supervised training: LR, RF, XGB, LGBM, calibration, baselines, splits (LOCO, spatial, temporal), metrics, report, model card, persistence
 - [ ] P5 FastAPI: `/v1/risk/model`, `/v1/risk/predict` (fail-soft `available:false` until a passing model exists); safety score `(1-p)*100`
 - [ ] P6 Backend: additive dynamic-city loader (JS) + tests; (route scoring untouched)
 - [ ] P7 Docs (`ml_service/README.md`, data guide), requirements, final verification
 - [ ] P8 (blocked on real data) Train on real incidents, read the report, decide with the owner whether to wire into route scoring
+
+## 4a. Integrated state (verified in the integration session, 2026-11-24)
+
+P1 + P2 + P3 are one pipeline on `feature/ml-infrastructure-clustering`:
+`inspect-incidents` (P2) -> `build-dataset` (P3, reads `road_features.csv` produced by the existing `extract`) -> P4 (not started).
+P3 came from a separate session ("Claude 3") as git bundle `p3-dataset-builder.bundle` (single commit `d8a3d09` on top of P2 `124771a`; the
+`.patch` was the same commit). It was integrated by fast-forward, so no P1/P2 file was overwritten. Only one of bundle/patch was used.
+
+### Completed and tested
+- P1 dynamic cities, P2 ingestion/coverage/inspect, P3 dataset builder (`risk/{matching,labels,adapters,dataset}.py`, `build-dataset` CLI).
+- Full ML suite after integration: **115 passed** (74 before P3 + 41 new). K-Means, route scoring, backend and frontend untouched.
+- Independent end-to-end check through the real CLI on SYNTHETIC scratch data (not in the repo; every record id starts with `synthetic`):
+  - zero incidents (with and without a `complete` window): builds, writes an empty dataset, exit 3, "not trainable", blockers listed;
+  - verified -> label 1; pending -> that segment/month/band is absent (unlabelled, not 0); rejected -> no effect;
+  - `complete: false` or window geocoding 500 m -> **0 negative rows**, and the positive is written with `training_eligible=False`;
+  - Jalandhar, Bathinda and Delhi each produce rows (288 = 6 segments x 12 months x 4 bands each); a city with no coverage produces none;
+  - synthetic ids mark the dataset `isSynthetic: true` and `trainable: false`; no model was trained.
+- Not re-run because untouched: backend (75) and frontend (7) suites.
+
+### Implemented but awaiting real data
+- `build-dataset` on the real `road_features.csv` (owner machine only; git-ignored) + real incident files + real `coverage.json`. Today the sandbox has none of these, so no real dataset exists.
+- Trainability gate (`labels.require_trainable`): >= 200 positives, >= 1000 negatives, >= 2 cities with >= 30 positives and coverage. Currently NOT met.
+
+### Awaiting the incident-reporting / admin-verification workstream ("Claude 2")
+- The real incident-report schema is NOT in this repo or on any remote branch (checked `origin/*`). `risk/adapters.py::BackendIncidentSource` is built to a described contract
+  (status PENDING/VERIFIED/REJECTED, verifiedBy/At, rejectedBy/At, submittedAt, lat/lon or GeoJSON) with CANDIDATE field names in `DEFAULT_FIELD_MAP`, overridable by `--field-map`.
+  **Before first use: compare `DEFAULT_FIELD_MAP` with the real model and fix the map (do not add a second schema).** Unmapped documents are rejected with a counted reason, never guessed.
+- Records must carry a time of day and a location error <= 100 m (e.g. GPS accuracy) to become positives; otherwise they are "location uncertain" and unlabelled.
+- Verified user reports are never "complete" coverage, so they give positives with `training_eligible=False` unless the owner declares a defensible complete window.
+- SOS alarms are never read (adapter refuses `sos`, `activity`, `users`, `guardians` collections).
+
+### Remaining work for P4 (supervised training) - do NOT start with synthetic data
+`ml_service/safira_ml/risk/training.py`: call `labels.require_trainable(manifest)` first; train only on `training_eligible == True`; never use `lit_tag`, ids,
+`incident_*`, `coverage_*`, `nearest_incident_distance_m` as features; baselines (prevalence, time-only, length+time); LR, RF, XGBoost, LightGBM; calibration; LOCO + spatial-block + temporal splits;
+PR-AUC/precision/recall/F1/Brier/ECE with CIs; model card; persistence; add `xgboost`/`lightgbm` to `requirements.txt` (installed locally only: xgboost 3.4.1, lightgbm 4.7.0).
+Then P5 (FastAPI `available:false` until a passing model), P6 (Node dynamic-city loader), P7 (docs).
+
+### Open items / decisions
+- `radius` (default, plan 3.1) vs `nearest` matching; weekend flag not representable at month grain; output volume (4.8M rows per 100k segments x 12 months) -> consider negative down-sampling with prior-shift correction.
+- Municipal streetlight/CCTV features: not in P3. A working alternative implementation (distance counts per segment, NaN = no file for that city, inactive status ignored) exists ONLY on the local branch
+  `wip/p3-session-builder-local` (commit `57dfb9c`, not pushed). Its `dataset.py`/`tests/test_risk_dataset.py` collide with the integrated P3 and must NOT be merged wholesale; only `risk/municipal.py` + `risk/spatial.py` are candidates to port, once real municipal data exists.
+- The repo default branch is `claude--test`; the ML work lives only on `feature/ml-infrastructure-clustering`.
 
 ## 5. Log (newest last)
 
@@ -123,3 +165,7 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
   **Real state.** The sandbox has no `road_features.csv` and no incident data (both git-ignored; the owner has the CSV locally), so no real dataset exists or was built: `build-dataset` here exits 2 (CSV missing). With the real CSV and no incidents it reports "No real training dataset is available". Synthetic fixtures live only in `tests/` and every test writes under pytest `tmp_path`.
   **Open issues / owner decisions.** (1) `radius` vs `nearest` default (see above). (2) Plan 3.2 mentions a "weekend flag" but the row grain is a month, so it is not representable; adding a day-type dimension doubles the rows - decide in P4. (3) Output volume (segments x 4 x covered months); consider negative down-sampling with prior-shift correction in P4 (stream by `period`). (4) Records from the incident-report workflow will be unusable as positives unless each carries a location error <= R (e.g. GPS accuracy) and a time of day; blank error => "location uncertain". (5) Verified user reports are never "complete" coverage, so they yield positives with `training_eligible=False` unless the owner declares a defensible complete window. (6) Naive timestamps are interpreted as Asia/Kolkata (P2 rule, flagged `timezone_assumed`); month/band boundaries are not widened for it. (7) Municipal CSV features (streetlights/CCTV) not implemented: no data exists. (8) Distances are straight-line UTM, not network distance. (9) Incident `description` text is intentionally never carried into datasets.
   **EXACT NEXT TASK = P4** (only after real, verified incidents + a real `coverage.json` + the real `road_features.csv` exist; run `build-dataset` and check `manifest.json` has `trainable: true` and `isSynthetic: false`): `ml_service/safira_ml/risk/training.py` - call `labels.require_trainable(manifest)` first; read `observations.csv` filtered to `training_eligible`; baselines (prevalence, time-only, length+time), LR / RF / XGBoost / LightGBM, LOCO + spatial-block + temporal splits, calibration, metrics + CIs, model card. If the data does not exist yet, P4 must not be started with synthetic data; the next useful step is P6/P7 (dynamic-city loader in the Node backend, docs) or obtaining the data.
+- 2026-11-24 P3 INTEGRATED (integration session). Inspected bundle (`git bundle verify` ok; requires P2 commit `124771a`, present) and patch (identical to bundle commit `d8a3d09`). Saved this session's own unfinished, uncommitted P3 attempt to local branch `wip/p3-session-builder-local` (`57dfb9c`) because it used the same file names, then `git merge --ff-only` to `d8a3d09`. No reset, clean or force.
+  Verification: ML suite 115 passed; scenario checks listed in section 4a all behaved as required. Findings: Claude 3's builder is stricter than the first-session draft (guard band, de-duplication, "complete window with zero delivered records is not evidence", audit outputs), so it was kept as the single P3.
+  Risks recorded: backend adapter field names unverified against Claude 2's real schema (section 4a); real data absent so no real dataset or model exists.
+
