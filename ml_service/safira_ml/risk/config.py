@@ -18,6 +18,10 @@ STANDARD_CATEGORIES = (
 )
 VERIFICATION_VALUES = ("verified", "unverified", "rejected")
 SOURCES = ("ncrb", "police", "municipal", "field_survey", "user_report")
+# Preference when two sources report the same event (first listed wins). Only used to choose which record
+# represents a duplicate group; it never changes a label.
+SOURCE_PRIORITY = ("police", "municipal", "field_survey", "user_report", "ncrb")
+MATCH_MODES = ("radius", "nearest")
 
 # Time bands in LOCAL time (start inclusive, end exclusive, hours). 'night' wraps midnight.
 TIME_BANDS = {"night": (22, 5), "early": (5, 9), "day": (9, 17), "evening": (17, 22)}
@@ -35,6 +39,13 @@ class RiskConfig:
     max_default_location_error_m: float = 100.0
     naive_timestamps_timezone: str = "Asia/Kolkata"   # used (and flagged) when a timestamp has no zone
     seed: int = 42
+    # --- P3 dataset builder (all judgement calls, recorded in every dataset manifest) ---
+    match_mode: str = "radius"             # "radius": every segment within label_radius_m of the incident gets y=1;
+                                           # "nearest": only the single nearest segment does (others become unlabelled)
+    dedupe_distance_m: float = 50.0        # same category + within this distance + within the window => same event
+    dedupe_window_minutes: float = 120.0
+    exclude_short_segments: bool = True    # is_short segments (< min_segment_m) are never labelled (as in K-Means)
+    max_horizon_months: int = 240          # sanity limit on the observation horizon per city
 
     def to_dict(self) -> dict:
         return asdict(self)

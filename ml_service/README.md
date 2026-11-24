@@ -160,6 +160,51 @@ The React route cards show the infrastructure profile next to the existing indic
 affect score, confidence or ranking. Using clusters in scoring would be a separate, versioned
 change that needs its own evaluation.
 
+## Supervised dataset builder (P3)
+
+Builds the labelled table a future incident-probability model would learn from. **It trains nothing**, does not
+touch K-Means, route scores or the database, and never invents an incident.
+
+```bash
+python -m safira_ml.cli inspect-incidents          # what incident data exists / what is missing
+python -m safira_ml.cli build-dataset              # road_features.csv + data/incidents/ -> data/datasets/dataset_<id>/
+#   --radius 100  --match-mode radius|nearest  --features PATH  --dir PATH  --out PATH
+#   --backend-export export.jsonl | --mongo-collection NAME  [--field-map map.json]   (backend incident reports)
+```
+
+Exit code 0 = trainable, 3 = built but **not** trainable (the normal state until real data exists), 2 = error.
+With zero incidents it writes only the manifest/report and says that no real training dataset is available.
+
+**Inputs.** `data/road_features.csv` (from `extract`, reused as-is); incident records (`data/incidents/*.csv|jsonl`
+or backend reports through the adapter in `risk/adapters.py`); `data/incidents/coverage.json`. Incident data is
+private and git-ignored. Cities come from the registry, so Jalandhar, Bathinda, Delhi and any city in `cities.json`
+work without code changes.
+
+**Row** = road segment x local calendar month x time band (`night` 22-05, `early` 05-09, `day` 09-17, `evening` 17-22,
+city-local time). Rules, in short (full text in `safira_ml/risk/labels.py`):
+
+| Outcome | Rule |
+|---|---|
+| `label = 1` | a **verified**, in-scope, de-duplicated incident with a known time of day and location error <= radius lies within the radius of the segment geometry in that month and band |
+| `label = 0` | only inside a **usable complete coverage window** (explicit `complete: true`, geocoding <= radius, covers the whole month, optional `bbox` contains the segment, and the window's source actually delivered records for that city/period) and nothing below applies |
+| unlabelled | everything else: no complete coverage; a **pending** incident, a date-only incident, or an incident with unknown/oversized location error could affect the row; or a positive lies in the guard band (radius, radius + its error] |
+| ignored | **rejected** incidents (no effect), duplicates, out-of-scope categories. **SOS alarms are never incidents** (`sos` is not an accepted source and the SOS/activity collections are never read) |
+
+Positives outside complete coverage are kept (`label = 1`) but marked `training_eligible = False`, so a model cannot
+learn "where data exists" as risk. `--match-mode nearest` labels only the nearest segment per incident.
+Infrastructure features are carried through untouched (missing stays missing) and **never influence a label**.
+
+**Outputs** in `data/datasets/dataset_<id>/` (the id is a hash of all inputs: same inputs, same bytes; new verified
+reports are picked up by running the command again): `observations.csv`, `incident_decisions.csv` (every incident, its
+decision and reason, duplicate link, provenance such as `verified_by/at`, `source_file`), `incident_matches.csv`
+(every incident x segment match with distance and effect), `segment_exclusions.csv`, `manifest.json` (input sha256,
+parameters, coverage audit, counts, blockers) and `BUILD_REPORT.md`.
+Size grows with segments x 4 x covered months (100k segments x 12 months = 4.8M rows, ~1.3 GB CSV, ~90 s).
+
+Incident records containing an id/ref that starts with `SYNTHETIC` are flagged: the dataset is marked synthetic, can
+never be trainable, is written to `latest_synthetic.json`, and cannot be mixed with real records. Test fixtures live
+only in `tests/`.
+
 ## Tests
 
 ```bash
