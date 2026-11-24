@@ -120,6 +120,17 @@ is unset they refuse to serve (fail closed).
 Interactive docs at `http://127.0.0.1:8001/docs` when running locally.
 Generate/train jobs are serialised (a second concurrent job gets HTTP 409).
 
+## Density map (PNG)
+
+```bash
+python -m safira_ml.cli density-map --from-csv data/road_features.csv   # after `train`
+```
+
+Writes `reports/infrastructure_density_map.png`: every road segment coloured by its cluster's
+level (one sequential hue, darker = more *mapped* infrastructure) per city, plus the share of
+segments per level. It uses the saved model and is **descriptive only**: it is not a safety map,
+sparse mapping looks the same as sparse infrastructure, and it does not feed route scores.
+
 ## Algorithm comparison
 
 K-Means was chosen as the starting point, then benchmarked against nine alternatives (MiniBatch and

@@ -141,6 +141,20 @@ def cmd_serve(args) -> int:
     return 0
 
 
+def cmd_density_map(args) -> int:
+    from .density_map import assign_levels, plot_density_map
+    from .persistence import load_bundle
+    frame = _frame_from_csv(Path(args.from_csv))
+    bundle = load_bundle(args.scope, args.version)
+    rows = assign_levels(frame, bundle)
+    out = Path(args.out) if args.out else reports_dir()
+    out.mkdir(parents=True, exist_ok=True)
+    info = plot_density_map(rows, out / "infrastructure_density_map.png", bundle.version)
+    print(f"written {info['path']}")
+    print(info["shares"])
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="safira_ml", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -186,6 +200,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--only", help="comma-separated algorithm keys, e.g. kmeans,ward")
     p.add_argument("--seed", type=int, default=42)
     p.set_defaults(func=cmd_compare)
+
+    p = sub.add_parser("density-map", help="PNG map of mapped-infrastructure density (not a safety map)")
+    p.add_argument("--from-csv", required=True, help="road_features.csv from `extract`")
+    p.add_argument("--scope", default="global")
+    p.add_argument("--version")
+    p.add_argument("--out")
+    p.set_defaults(func=cmd_density_map)
 
     p = sub.add_parser("assign", help="write cluster assignments into RoadSegmentFeature")
     p.add_argument("--scope", default="global")
