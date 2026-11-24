@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, Clock, Loader2, MapPin, Route, Search, X } from 'lucide-react';
+import FacilityStrip from './FacilityStrip';
 import InfrastructureProfile, {
   InfrastructureProfileDetail,
   InfrastructureProfileNote,
@@ -8,6 +9,7 @@ import {
   SCORE_LABELS,
   getConfidenceSummary,
   getRecommendationReview,
+  getSharedStripMax,
   splitIndicators,
 } from '../../utils/routeCardModel';
 
@@ -310,6 +312,7 @@ export function SafeRouteAlternatives({
             )}
           </div>
           {routes.map((route, index) => {
+            const stripMax = getSharedStripMax(routes);
             const isSelected = index === selectedRouteIndex;
             const hasScore = Number.isFinite(route.score);
             const { known } = splitIndicators(route.indicators);
@@ -369,6 +372,7 @@ export function SafeRouteAlternatives({
                   )}
                 </button>
                 <div className="mt-2 space-y-1">
+                  <FacilityStrip route={route} sharedMax={stripMax} />
                   <InfrastructureProfile infrastructure={infrastructure} routeId={route.id} />
                   <button
                     type="button"

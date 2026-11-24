@@ -58,3 +58,39 @@ test('recommendation review mirrors the backend decision without recomputing it'
   assert.equal(getRecommendationReview(route, 0, recommended).note, null);
   assert.equal(getRecommendationReview(route, 0, undefined).status, 'alternative');
 });
+
+import { getFacilityStrip, getSharedStripMax, getStripLevel } from '../src/utils/routeCardModel.js';
+
+const seg = (police, hospital, pharmacy, open24x7 = 0) => ({ evidence: { policeCount: police, hospitalCount: hospital, pharmacyCount: pharmacy, open24x7Count: open24x7 } });
+
+test('facility strip sums police/hospital/pharmacy per segment and counts unique places per route', () => {
+  const route = {
+    segments: [seg(1, 0, 2), seg(0, 0, 0), seg(0, 1, 0)],
+    facilities: [
+      { type: 'Police', open24x7: false }, { type: 'Pharmacy', open24x7: true },
+      { type: 'Clinic', open24x7: false }, { type: 'Mapped establishment', open24x7: true },
+    ],
+  };
+  const strip = getFacilityStrip(route);
+  assert.deepEqual(strip.cells.map((cell) => cell.total), [3, 0, 1]);
+  assert.equal(strip.maxCell, 3);
+  assert.equal(strip.segmentsWithHelp, 2);
+  assert.deepEqual(strip.totals, { police: 1, hospital: 1, pharmacy: 1, open24x7: 1 });
+});
+
+test('24/7 total is unknown (null), not zero, when the analysis predates the flag; missing data is safe', () => {
+  const strip = getFacilityStrip({ segments: [seg(1, 0, 0)], facilities: [{ type: 'Police' }] });
+  assert.equal(strip.totals.open24x7, null);
+  assert.deepEqual(getFacilityStrip({}).cells, []);
+  assert.deepEqual(getFacilityStrip(null).totals.police, 0);
+});
+
+test('strip levels use one shared scale across routes; zero is its own level', () => {
+  const routes = [{ segments: [seg(4, 0, 0)] }, { segments: [seg(1, 0, 0)] }];
+  const max = getSharedStripMax(routes);
+  assert.equal(max, 4);
+  assert.equal(getStripLevel(0, max), 0);
+  assert.equal(getStripLevel(1, max), 1);
+  assert.equal(getStripLevel(4, max), 4);
+  assert.equal(getSharedStripMax([]), 1);
+});

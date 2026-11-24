@@ -186,6 +186,8 @@ export const getRouteFacilities = (segments, features, searchRadiusMeters, limit
             lat: latitude,
             lon: longitude,
             distanceMeters: Math.round(distance),
+            // Display only: explicitly tagged round-the-clock opening hours (never inferred).
+            open24x7: String(tags.opening_hours || '').trim() === '24/7',
             source: 'OpenStreetMap',
         });
     }
@@ -311,6 +313,12 @@ const scoreSegment = (segment, features, options) => {
             hospitalCount: emergency.filter(({ tags }) => ['hospital', 'clinic'].includes(tags.amenity)).length,
             pharmacyCount: emergency.filter(({ tags }) => tags.amenity === 'pharmacy').length,
             publicTransportCount: publicTransport.length,
+            // Display only: mapped places explicitly tagged opening_hours=24/7 near this segment.
+            open24x7Count: nearby.filter(({ feature }) => {
+                const tags = getFeatureTags(feature);
+                return (isEmergencyFacility(tags) || isEstablishment(tags))
+                    && String(tags.opening_hours || '').trim() === '24/7';
+            }).length,
         },
         _observedIndicators: observed,
         _hasActivityData: mappedActivity,

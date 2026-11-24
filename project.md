@@ -157,4 +157,11 @@ There are NO `police`, `hospital`, `pharmacy`, `shops` categories. Those classes
   The PNG layout was checked on SYNTHETIC data only; no PNG of real results exists yet. Level names depend on the real model; with k=2 only sparse/rich appear.
   Learnings: matplotlib suptitle vs fig.legend overlap -> anchor legend explicitly (bbox_to_anchor) and leave top margin in tight_layout rect; use a larger marker (s~7) for sparse grids.
   NEXT STEP: owner runs the pipeline on real data (extract, evaluate, compare, train, density-map) and sends the two reports + PNG; then decide on K-Means vs alternative.
+- 2026-11-24 (later): "Mapped help nearby" strip on every route card (owner request: picture comparing routes by police stations, pharmacies, hospitals, 24/7 places).
+  CREATED `frontend/src/components/Map/FacilityStrip.jsx` (one cell per route segment, coloured by count of mapped police + hospital/clinic + pharmacy within 1 km of that segment; 0 = "none mapped" (grey), 1-4 = quartiles of a scale SHARED by all route cards; totals chips; "Not a safety rating"). Helpers in `frontend/src/utils/routeCardModel.js`: `getFacilityStrip`, `getSharedStripMax`, `getStripLevel` (+3 tests; frontend 7 pass).
+  BACKEND (additive, display-only, scoring untouched): `routeScoringService.js` -> `facilities[].open24x7` (true only for explicit opening_hours=24/7) and `segments[].evidence.open24x7Count` (unique nearby emergency/establishment places; first version double-counted a pharmacy that is both -> fixed by counting from `nearby`). Test added in `safeRouteAnalysis.test.js` (backend 75 pass).
+  Old stored analyses lack the 24/7 flags -> UI hides the 24/7 chip (null = unknown, not zero). ROUTE_SCORING_VERSION unchanged (2).
+  Layout verified in a real browser on a SYNTHETIC preview fixture (deleted). Real route data not seen (sandbox has none).
+  Learnings: pharmacies count as both emergency facility and establishment - dedupe when summing; keep unknown (null) distinct from zero.
+  NEXT STEP: owner pulls the branch, re-imports cities, runs a route analysis and checks the strip with real data; still pending: real extract/evaluate/compare/train/density-map runs.
 

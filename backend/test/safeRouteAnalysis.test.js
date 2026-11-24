@@ -194,3 +194,22 @@ test('missing city OSM features leave route score unavailable and confidence at 
     assert.equal(result.confidence, 0);
     assert.ok(result.explanations.some((explanation) => explanation.includes('unavailable')));
 });
+
+test('24/7 flags are display-only: set only for explicit opening_hours=24/7', () => {
+    const segment = makeSegment(0, [28.6, 77.2], [28.6009, 77.2]);
+    const features = [
+        { osmType: 'node', osmId: 'a', geometry: { type: 'Point', coordinates: [77.2, 28.6005] },
+            tags: { amenity: 'pharmacy', opening_hours: '24/7' } },
+        { osmType: 'node', osmId: 'b', geometry: { type: 'Point', coordinates: [77.2002, 28.6005] },
+            tags: { amenity: 'police' } },
+        { osmType: 'node', osmId: 'c', geometry: { type: 'Point', coordinates: [77.2003, 28.6005] },
+            tags: { amenity: 'hospital', opening_hours: 'Mo-Fr 09:00-17:00' } },
+    ];
+    const result = scoreRouteSegments([segment], features, {
+        mode: 'walking', timezone: 'Asia/Kolkata', searchRadiusMeters: 125,
+    });
+    const flags = Object.fromEntries(result.facilities.map((facility) => [facility.type, facility.open24x7]));
+    assert.deepEqual(flags, { Pharmacy: true, Police: false, Hospital: false });
+    assert.equal(result.segments[0].evidence.open24x7Count, 1);
+    assert.equal(result.segments[0].evidence.policeCount, 1);
+});
