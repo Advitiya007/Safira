@@ -6,6 +6,8 @@
   compare   benchmark K-Means against other clustering algorithms
   assign    write cluster assignments into RoadSegmentFeature using the saved model
   serve     run the FastAPI service
+  inspect-incidents  what incident data exists / what blocks supervised training
+  build-dataset      road_features.csv + incidents + coverage -> labelled supervised dataset (no training)
 """
 
 from __future__ import annotations
@@ -163,6 +165,42 @@ def cmd_inspect_incidents(args) -> int:
     return 0 if report["trainable"] else 3
 
 
+def cmd_build_dataset(args) -> int:
+    from dataclasses import replace
+    from .risk.adapters import BackendIncidentSource, FileIncidentSource
+    from .risk.config import INCIDENT_DIR, RiskConfig
+    from .risk.coverage import CoverageError, load_coverage
+    from .risk.dataset import DatasetBuildError, build_dataset
+
+    config = replace(RiskConfig(), label_radius_m=args.radius, match_mode=args.match_mode)
+    incident_dir = Path(args.dir) if args.dir else INCIDENT_DIR
+    try:
+        if args.backend_export or args.mongo_collection:
+            field_map = json.loads(Path(args.field_map).read_text(encoding="utf-8")) if args.field_map else None
+            if args.mongo_collection:
+                from .db import get_database
+                source = BackendIncidentSource.from_database(get_database(), args.mongo_collection, field_map=field_map)
+            else:
+                source = BackendIncidentSource.from_jsonl(Path(args.backend_export), field_map=field_map)
+            windows = load_coverage(incident_dir)      # coverage is always declared in coverage.json
+        else:
+            source, windows = FileIncidentSource(incident_dir), None
+        result = build_dataset(Path(args.features) if args.features else data_dir() / "road_features.csv",
+                               source, Path(args.out) if args.out else None, config, windows)
+    except (DatasetBuildError, CoverageError, ValueError) as exc:
+        print(f"build-dataset failed: {exc}", file=sys.stderr)
+        return 2
+    manifest = result.manifest
+    print(f"dataset {manifest['datasetId']} ({manifest['dataOrigin']}) -> {result.dataset_dir}")
+    o = manifest["observations"]
+    print(f"rows {o['rowsWritten']}  positive {o['positive']} (training-eligible {o['positiveTrainingEligible']})  "
+          f"negative {o['negative']}  unlabelled {o['unlabelled']}")
+    print("TRAINABLE: " + ("yes" if result.trainable else "NO"))
+    for blocker in manifest["blockers"]:
+        print(f"  - {blocker}")
+    return 0 if result.trainable else 3
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="safira_ml", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -220,6 +258,17 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--dir", help="incident directory (default ml_service/data/incidents)")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_inspect_incidents)
+
+    p = sub.add_parser("build-dataset", help="build the labelled supervised dataset (does not train anything)")
+    p.add_argument("--features", help="road_features.csv (default ml_service/data/road_features.csv)")
+    p.add_argument("--dir", help="incident directory holding incidents + coverage.json (default data/incidents)")
+    p.add_argument("--out", help="output root (default ml_service/data/datasets)")
+    p.add_argument("--radius", type=float, default=100.0, help="match radius in metres (default 100)")
+    p.add_argument("--match-mode", choices=["radius", "nearest"], default="radius")
+    p.add_argument("--backend-export", help="JSONL export of backend incident reports (see risk/adapters.py)")
+    p.add_argument("--mongo-collection", help="backend incident-report collection (must be named explicitly)")
+    p.add_argument("--field-map", help="JSON overriding backend field names")
+    p.set_defaults(func=cmd_build_dataset)
 
     p = sub.add_parser("assign", help="write cluster assignments into RoadSegmentFeature")
     p.add_argument("--scope", default="global")

@@ -16,3 +16,4 @@ cities.json
 # Incident data is private/sensitive: never commit it (see ../ML_PREDICTION_PROGRESS.md)
 data/incidents/
 data/municipal/
+data/datasets/

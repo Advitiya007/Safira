@@ -36,6 +36,9 @@ class CoverageWindow:
     complete: bool
     location_error_m: float
     notes: str = ""
+    # Optional geographic limit {south, west, north, east}. None = the whole city. A segment can only be
+    # labelled 0 by this window if its bounding box lies entirely inside it.
+    bbox: Optional[dict] = None
 
 
 def parse_coverage(payload) -> list[CoverageWindow]:
@@ -61,7 +64,16 @@ def parse_coverage(payload) -> list[CoverageWindow]:
             raise CoverageError(f"{city_id}/{source}: start, end and numeric location_error_m are required") from exc
         if not start < end or error < 0:
             raise CoverageError(f"{city_id}/{source}: need start < end and location_error_m >= 0")
-        out.append(CoverageWindow(source, city_id, start, end, entry["complete"], error, str(entry.get("notes", ""))))
+        bbox = None
+        if entry.get("bbox") is not None:
+            try:
+                bbox = {k: float(entry["bbox"][k]) for k in ("south", "west", "north", "east")}
+            except (KeyError, TypeError, ValueError) as exc:
+                raise CoverageError(f"{city_id}/{source}: bbox needs numeric south, west, north, east") from exc
+            if not bbox["south"] < bbox["north"] or not bbox["west"] < bbox["east"]:
+                raise CoverageError(f"{city_id}/{source}: bbox must have south < north and west < east")
+        out.append(CoverageWindow(source, city_id, start, end, entry["complete"], error,
+                                  str(entry.get("notes", "")), bbox))
     return out
 
 

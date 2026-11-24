@@ -18,9 +18,12 @@ from ..config import CITY_BOUNDING_BOXES, CITY_META
 from .config import SOURCES, STANDARD_CATEGORIES, VERIFICATION_VALUES, RiskConfig
 
 REQUIRED_COLUMNS = ("incident_id", "source", "category", "occurred_at", "lat", "lon", "verification")
-OPTIONAL_COLUMNS = ("source_ref", "location_error_m", "city_id")
+# Provenance columns are passed through untouched (never interpreted) so every label can be traced back.
+PROVENANCE_COLUMNS = ("submitted_at", "verified_by", "verified_at", "rejected_by", "rejected_at")
+OPTIONAL_COLUMNS = ("source_ref", "location_error_m", "city_id", *PROVENANCE_COLUMNS)
 CLEAN_COLUMNS = ("incident_id", "source", "source_ref", "category", "occurred_at_utc", "occurred_local",
-                 "time_known", "timezone_assumed", "lat", "lon", "location_error_m", "verification", "city_id")
+                 "time_known", "timezone_assumed", "lat", "lon", "location_error_m", "verification", "city_id",
+                 *PROVENANCE_COLUMNS, "source_file")
 
 
 class IncidentFileError(ValueError):
@@ -135,6 +138,8 @@ def validate_incidents(raw: pd.DataFrame, config: Optional[RiskConfig] = None,
             "category": category, "occurred_at_utc": utc, "occurred_local": utc.tz_convert(zone).tz_localize(None),
             "time_known": time_known, "timezone_assumed": tz_assumed, "lat": lat, "lon": lon,
             "location_error_m": error_m, "verification": verification, "city_id": city_id,
+            **{column: str(row.get(column, "") or "").strip() for column in PROVENANCE_COLUMNS},
+            "source_file": "",
         })
     frame = pd.DataFrame(kept, columns=list(CLEAN_COLUMNS))
     report = {"rowsRead": int(len(raw)), "rowsKept": int(len(frame)), "rejected": dict(rejected),
@@ -164,6 +169,7 @@ def load_incident_dir(directory: Path, config: Optional[RiskConfig] = None) -> t
             continue
         per_file[path.name] = report
         totals.update(report["rejected"])
+        clean["source_file"] = path.name
         frames.append(clean)
     frame = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=list(CLEAN_COLUMNS))
     if len(frame):
