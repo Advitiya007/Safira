@@ -1,0 +1,860 @@
+{
+  "disclaimer": "Clusters describe the availability and spatial distribution of mapped OpenStreetMap infrastructure. They are not crime predictions, do not measure safety, and a missing mapped feature is not proof that it does not exist.",
+  "data": {
+    "segmentsUsed": 3999,
+    "cities": [
+      "bathinda",
+      "delhi",
+      "jalandhar"
+    ],
+    "features": [
+      "length_m",
+      "police_count",
+      "police_nearest_m",
+      "hospital_count",
+      "hospital_nearest_m",
+      "pharmacy_count",
+      "pharmacy_nearest_m",
+      "shop_count",
+      "transport_count",
+      "establishment_density_per_km2"
+    ],
+    "droppedFeatures": {
+      "foot_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+      "vehicle_access": "observed for only 0% of segments in jalandhar (minimum 60%)",
+      "sidewalk_present": "observed for only 0% of segments in bathinda (minimum 60%)"
+    },
+    "exclusions": {
+      "input": 119513,
+      "duplicates": 0,
+      "short": 15964,
+      "kept": 103549
+    }
+  },
+  "rules": {
+    "maxNoiseFraction": 0.05,
+    "minAssignFidelity": 0.95,
+    "minStabilityARI": 0.6,
+    "parsimonyTolerance": 0.03,
+    "rankedMetrics": [
+      "silhouette",
+      "stabilityARI",
+      "transferARI",
+      "cityNMI",
+      "daviesBouldin"
+    ]
+  },
+  "recommended": "kmeans",
+  "recommendationReason": "lowest average rank (4.60) among algorithms that pass every requirement",
+  "algorithms": [
+    {
+      "key": "kmeans",
+      "label": "K-Means",
+      "nativePredict": true,
+      "why": "Simple, fast, has one centre per cluster, scores new segments by nearest centre.",
+      "complexity": 1,
+      "error": null,
+      "fitSeconds": 0.032,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.34960270404874694,
+          "minClusterFraction": 0.3223305826456614
+        },
+        {
+          "k": 3,
+          "silhouette": 0.2633716640942919,
+          "minClusterFraction": 0.12528132033008252
+        },
+        {
+          "k": 4,
+          "silhouette": 0.2436449551680834,
+          "minClusterFraction": 0.0587646911727932
+        },
+        {
+          "k": 5,
+          "silhouette": 0.2569842142849172,
+          "minClusterFraction": 0.044511127781945485
+        },
+        {
+          "k": 6,
+          "silhouette": 0.19283447095287654,
+          "minClusterFraction": 0.044511127781945485
+        },
+        {
+          "k": 7,
+          "silhouette": 0.19806729212263507,
+          "minClusterFraction": 0.027506876719179795
+        },
+        {
+          "k": 8,
+          "silhouette": 0.1987966496203152,
+          "minClusterFraction": 0.02700675168792198
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.3223305826456614,
+      "silhouette": 0.34960270404874694,
+      "daviesBouldin": 1.3996175388716319,
+      "calinskiHarabasz": 1795.2844310340029,
+      "cityNMI": 0.279047822623413,
+      "assignFidelity": 1.0,
+      "stabilityARI": 0.986125076905423,
+      "transferARI": 0.02304425940560216,
+      "transferSilhouette": 0.2843395693861863,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.99 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 4,
+        "stabilityARI": 2,
+        "transferARI": 7,
+        "cityNMI": 5,
+        "daviesBouldin": 5
+      },
+      "meanRank": 4.6,
+      "whyNot": null
+    },
+    {
+      "key": "minibatch_kmeans",
+      "label": "MiniBatch K-Means",
+      "nativePredict": true,
+      "why": "Same idea as K-Means but approximate; only worth it for millions of rows.",
+      "complexity": 1,
+      "error": null,
+      "fitSeconds": 0.095,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.39538612117128435,
+          "minClusterFraction": 0.2105526381595399
+        },
+        {
+          "k": 3,
+          "silhouette": 0.2613409662422933,
+          "minClusterFraction": 0.12178044511127782
+        },
+        {
+          "k": 4,
+          "silhouette": 0.2683679743343997,
+          "minClusterFraction": 0.06626656664166042
+        },
+        {
+          "k": 5,
+          "silhouette": 0.25717829841030043,
+          "minClusterFraction": 0.04276069017254314
+        },
+        {
+          "k": 6,
+          "silhouette": 0.1983717298827006,
+          "minClusterFraction": 0.03625906476619155
+        },
+        {
+          "k": 7,
+          "silhouette": 0.23185431437806353,
+          "minClusterFraction": 0.03075768942235559
+        },
+        {
+          "k": 8,
+          "silhouette": 0.19148744626289227,
+          "minClusterFraction": 0.023005751437859465
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.2105526381595399,
+      "silhouette": 0.39538612117128435,
+      "daviesBouldin": 1.342891918368136,
+      "calinskiHarabasz": 1704.7657952724642,
+      "cityNMI": 0.24871509055223162,
+      "assignFidelity": 1.0,
+      "stabilityARI": 0.7628223752476355,
+      "transferARI": 0.006554835206736639,
+      "transferSilhouette": 0.31434130797226023,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.76 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 2,
+        "stabilityARI": 6,
+        "transferARI": 9,
+        "cityNMI": 4,
+        "daviesBouldin": 3
+      },
+      "meanRank": 4.8,
+      "whyNot": [
+        "stabilityARI 0.76 vs 0.99 for K-Means"
+      ]
+    },
+    {
+      "key": "bisecting_kmeans",
+      "label": "Bisecting K-Means",
+      "nativePredict": true,
+      "why": "Splits clusters top-down; gives a hierarchy but is rarely better than plain K-Means.",
+      "complexity": 2,
+      "error": null,
+      "fitSeconds": 0.007,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.34973927092352625,
+          "minClusterFraction": 0.3218304576144036
+        },
+        {
+          "k": 3,
+          "silhouette": 0.31807994717908705,
+          "minClusterFraction": 0.07001750437609403
+        },
+        {
+          "k": 4,
+          "silhouette": 0.20639856449452312,
+          "minClusterFraction": 0.07001750437609403
+        },
+        {
+          "k": 5,
+          "silhouette": 0.21688427318941725,
+          "minClusterFraction": 0.056264066016504126
+        },
+        {
+          "k": 6,
+          "silhouette": 0.21713377270785184,
+          "minClusterFraction": 0.056264066016504126
+        },
+        {
+          "k": 7,
+          "silhouette": 0.22149571276887212,
+          "minClusterFraction": 0.027506876719179795
+        },
+        {
+          "k": 8,
+          "silhouette": 0.16699085079523163,
+          "minClusterFraction": 0.027506876719179795
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.3218304576144036,
+      "silhouette": 0.34973927092352625,
+      "daviesBouldin": 1.399366267469872,
+      "calinskiHarabasz": 1795.2866448531272,
+      "cityNMI": 0.2804990227150947,
+      "assignFidelity": 1.0,
+      "stabilityARI": 0.9815021893509367,
+      "transferARI": 0.021839799091535606,
+      "transferSilhouette": 0.2843562963173141,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.98 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 3,
+        "stabilityARI": 3,
+        "transferARI": 8,
+        "cityNMI": 6,
+        "daviesBouldin": 4
+      },
+      "meanRank": 4.8,
+      "whyNot": [
+        "Passed all requirements but ranked lower overall."
+      ]
+    },
+    {
+      "key": "gmm_diag",
+      "label": "Gaussian Mixture (diagonal)",
+      "nativePredict": true,
+      "why": "Soft membership and elliptical clusters, but assumes bell-shaped data; our counts and 0/1 columns are not bell-shaped.",
+      "complexity": 3,
+      "error": null,
+      "fitSeconds": 0.048,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.3148784227868757,
+          "minClusterFraction": 0.32033008252063017
+        },
+        {
+          "k": 3,
+          "silhouette": 0.28006263433396134,
+          "minClusterFraction": 0.0690172543135784
+        },
+        {
+          "k": 4,
+          "silhouette": 0.22716298928575118,
+          "minClusterFraction": 0.10852713178294573
+        },
+        {
+          "k": 5,
+          "silhouette": 0.1101048050076473,
+          "minClusterFraction": 0.0552638159539885
+        },
+        {
+          "k": 6,
+          "silhouette": 0.08780754729335917,
+          "minClusterFraction": 0.04101025256314079
+        },
+        {
+          "k": 7,
+          "silhouette": 0.10252791944809606,
+          "minClusterFraction": 0.02875718929732433
+        },
+        {
+          "k": 8,
+          "silhouette": 0.09377616383599868,
+          "minClusterFraction": 0.011002750687671918
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.32033008252063017,
+      "silhouette": 0.3148784227868757,
+      "daviesBouldin": 1.5335413869717431,
+      "calinskiHarabasz": 1486.1380780421803,
+      "cityNMI": 0.29645740670635906,
+      "assignFidelity": 1.0,
+      "stabilityARI": 0.755133614460418,
+      "transferARI": 0.3653946198801868,
+      "transferSilhouette": 0.23772943699640306,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.76 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 7,
+        "stabilityARI": 7,
+        "transferARI": 1,
+        "cityNMI": 7,
+        "daviesBouldin": 9
+      },
+      "meanRank": 6.2,
+      "whyNot": [
+        "silhouette 0.31 vs 0.35 for K-Means",
+        "stabilityARI 0.76 vs 0.99 for K-Means",
+        "daviesBouldin 1.53 vs 1.40 for K-Means"
+      ]
+    },
+    {
+      "key": "gmm_full",
+      "label": "Gaussian Mixture (full)",
+      "nativePredict": true,
+      "why": "Most flexible shapes but many parameters per cluster; unstable and slow with lumpy, discrete features.",
+      "complexity": 4,
+      "error": null,
+      "fitSeconds": 0.073,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.3149599695948818,
+          "minClusterFraction": 0.3205801450362591
+        },
+        {
+          "k": 3,
+          "silhouette": 0.28006263433396134,
+          "minClusterFraction": 0.0690172543135784
+        },
+        {
+          "k": 4,
+          "silhouette": 0.26312450541368343,
+          "minClusterFraction": 0.06501625406351588
+        },
+        {
+          "k": 5,
+          "silhouette": 0.10248863385542774,
+          "minClusterFraction": 0.06501625406351588
+        },
+        {
+          "k": 6,
+          "silhouette": 0.10117422988482519,
+          "minClusterFraction": 0.014253563390847712
+        },
+        {
+          "k": 7,
+          "silhouette": 0.08607278396003146,
+          "minClusterFraction": 0.043010752688172046
+        },
+        {
+          "k": 8,
+          "silhouette": 0.07937212526891514,
+          "minClusterFraction": 0.012003000750187547
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.3205801450362591,
+      "silhouette": 0.3149599695948818,
+      "daviesBouldin": 1.5331257030644454,
+      "calinskiHarabasz": 1487.3352966342395,
+      "cityNMI": 0.2970119279280066,
+      "assignFidelity": 1.0,
+      "stabilityARI": 1.0,
+      "transferARI": 0.33535488807144237,
+      "transferSilhouette": 0.23384549339179894,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 1.00 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 6,
+        "stabilityARI": 1,
+        "transferARI": 3,
+        "cityNMI": 8,
+        "daviesBouldin": 8
+      },
+      "meanRank": 5.2,
+      "whyNot": [
+        "silhouette 0.31 vs 0.35 for K-Means",
+        "daviesBouldin 1.53 vs 1.40 for K-Means"
+      ]
+    },
+    {
+      "key": "birch",
+      "label": "Birch",
+      "nativePredict": true,
+      "why": "Fast single-pass summary tree; result depends on data order and a distance threshold.",
+      "complexity": 3,
+      "error": null,
+      "fitSeconds": 0.161,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.4843860520272392,
+          "minClusterFraction": 0.04826206551637909
+        },
+        {
+          "k": 3,
+          "silhouette": 0.29938696528375885,
+          "minClusterFraction": 0.04826206551637909
+        },
+        {
+          "k": 4,
+          "silhouette": 0.28826845753606034,
+          "minClusterFraction": 0.04826206551637909
+        },
+        {
+          "k": 5,
+          "silhouette": 0.22637184697241533,
+          "minClusterFraction": 0.04826206551637909
+        },
+        {
+          "k": 6,
+          "silhouette": 0.22530811254655664,
+          "minClusterFraction": 0.01350337584396099
+        },
+        {
+          "k": 7,
+          "silhouette": 0.22987747562249933,
+          "minClusterFraction": 0.01350337584396099
+        },
+        {
+          "k": 8,
+          "silhouette": 0.22510186527059492,
+          "minClusterFraction": 0.01350337584396099
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.04826206551637909,
+      "silhouette": 0.4843860520272392,
+      "daviesBouldin": 1.0043042570135854,
+      "calinskiHarabasz": 869.6186017583174,
+      "cityNMI": 0.08345188128311354,
+      "assignFidelity": 1.0,
+      "stabilityARI": 0.7279135530539937,
+      "transferARI": -0.02604184671895787,
+      "transferSilhouette": 0.19507798114678332,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": true,
+          "detail": "scores new segments with the saved model (reproduces its own labels 100%)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.73 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": true,
+      "ranks": {
+        "silhouette": 1,
+        "stabilityARI": 8,
+        "transferARI": 10,
+        "cityNMI": 3,
+        "daviesBouldin": 1
+      },
+      "meanRank": 4.6,
+      "whyNot": [
+        "stabilityARI 0.73 vs 0.99 for K-Means",
+        "transferARI -0.03 vs 0.02 for K-Means"
+      ]
+    },
+    {
+      "key": "ward",
+      "label": "Agglomerative (Ward)",
+      "nativePredict": false,
+      "why": "Good quality but has no 'predict': new segments cannot be scored without bolting on a second model, and it needs memory that grows with the square of the data.",
+      "complexity": 2,
+      "error": null,
+      "fitSeconds": 0.321,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.32073183581931386,
+          "minClusterFraction": 0.33233308327081773
+        },
+        {
+          "k": 3,
+          "silhouette": 0.1653188921001484,
+          "minClusterFraction": 0.3250812703175794
+        },
+        {
+          "k": 4,
+          "silhouette": 0.185092429562944,
+          "minClusterFraction": 0.10902725681420355
+        },
+        {
+          "k": 5,
+          "silhouette": 0.19510475670779953,
+          "minClusterFraction": 0.01350337584396099
+        },
+        {
+          "k": 6,
+          "silhouette": 0.20081296765581047,
+          "minClusterFraction": 0.01350337584396099
+        },
+        {
+          "k": 7,
+          "silhouette": 0.14817235734836856,
+          "minClusterFraction": 0.01350337584396099
+        },
+        {
+          "k": 8,
+          "silhouette": 0.1544892710018375,
+          "minClusterFraction": 0.01350337584396099
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.33233308327081773,
+      "silhouette": 0.32073183581931386,
+      "daviesBouldin": 1.4847473899553731,
+      "calinskiHarabasz": 1572.2910337207927,
+      "cityNMI": 0.3098770309914907,
+      "assignFidelity": 0.929732433108277,
+      "stabilityARI": 0.3098955244927499,
+      "transferARI": 0.2586962211514712,
+      "transferSilhouette": 0.25603334052210097,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": false,
+          "detail": "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 93% of segments, so the problem is structural, not accuracy)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": false,
+          "detail": "stability ARI 0.31 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": false,
+      "ranks": {
+        "silhouette": 5,
+        "stabilityARI": 9,
+        "transferARI": 5,
+        "cityNMI": 10,
+        "daviesBouldin": 6
+      },
+      "meanRank": 7.0,
+      "whyNot": [
+        "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 93% of segments, so the problem is structural, not accuracy)",
+        "stability ARI 0.31 (minimum 0.60)",
+        "stabilityARI 0.31 vs 0.99 for K-Means",
+        "cityNMI 0.31 vs 0.28 for K-Means",
+        "daviesBouldin 1.48 vs 1.40 for K-Means"
+      ]
+    },
+    {
+      "key": "spectral",
+      "label": "Spectral",
+      "nativePredict": false,
+      "why": "Finds odd-shaped groups, but has no 'predict' and is slow and memory-hungry on a full road network.",
+      "complexity": 4,
+      "error": null,
+      "fitSeconds": 0.319,
+      "k": 2,
+      "densityParams": null,
+      "kCurve": [
+        {
+          "k": 2,
+          "silhouette": 0.2828061197165806,
+          "minClusterFraction": 0.4113528382095524
+        },
+        {
+          "k": 3,
+          "silhouette": 0.0799676147431344,
+          "minClusterFraction": 0.1970492623155789
+        },
+        {
+          "k": 4,
+          "silhouette": 0.08289646145715676,
+          "minClusterFraction": 0.06526631657914479
+        },
+        {
+          "k": 5,
+          "silhouette": 0.09215648778277616,
+          "minClusterFraction": 0.03875968992248062
+        },
+        {
+          "k": 6,
+          "silhouette": 0.0780013672147866,
+          "minClusterFraction": 0.03975993998499625
+        },
+        {
+          "k": 7,
+          "silhouette": 0.08476483828749667,
+          "minClusterFraction": 0.03950987746936734
+        },
+        {
+          "k": 8,
+          "silhouette": 0.11101894337037256,
+          "minClusterFraction": 0.023255813953488372
+        }
+      ],
+      "nClusters": 2,
+      "noiseFraction": 0.0,
+      "minClusterFraction": 0.4113528382095524,
+      "silhouette": 0.2828061197165806,
+      "daviesBouldin": 1.5112850977371632,
+      "calinskiHarabasz": 1507.1488188436238,
+      "cityNMI": 0.29754569053068486,
+      "assignFidelity": 0.9274818704676169,
+      "stabilityARI": 0.30416622682266353,
+      "transferARI": 0.22550542173757684,
+      "transferSilhouette": 0.26347070860433064,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": false,
+          "detail": "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 93% of segments, so the problem is structural, not accuracy)"
+        },
+        "everySegmentProfiled": {
+          "passed": true,
+          "detail": "0% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": false,
+          "detail": "stability ARI 0.30 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": false,
+      "ranks": {
+        "silhouette": 8,
+        "stabilityARI": 10,
+        "transferARI": 6,
+        "cityNMI": 9,
+        "daviesBouldin": 7
+      },
+      "meanRank": 8.0,
+      "whyNot": [
+        "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 93% of segments, so the problem is structural, not accuracy)",
+        "stability ARI 0.30 (minimum 0.60)",
+        "silhouette 0.28 vs 0.35 for K-Means",
+        "stabilityARI 0.30 vs 0.99 for K-Means",
+        "daviesBouldin 1.51 vs 1.40 for K-Means"
+      ]
+    },
+    {
+      "key": "dbscan",
+      "label": "DBSCAN",
+      "nativePredict": false,
+      "why": "Finds dense regions and calls everything else 'noise'. Road infrastructure is a smooth gradient, not islands, and we need a profile for every segment.",
+      "complexity": 3,
+      "error": null,
+      "fitSeconds": 5.232,
+      "k": null,
+      "densityParams": {
+        "eps": 1.975,
+        "min_samples": 10
+      },
+      "kCurve": [],
+      "nClusters": 5,
+      "noiseFraction": 0.09152288072018,
+      "minClusterFraction": 0.002477291494632535,
+      "silhouette": 0.21818863505237968,
+      "daviesBouldin": 1.0243249003021806,
+      "calinskiHarabasz": 39.415901119438864,
+      "cityNMI": 0.028659283898954585,
+      "assignFidelity": 0.8042010502625656,
+      "stabilityARI": 0.9187740519587466,
+      "transferARI": 0.3439553786443537,
+      "transferSilhouette": 0.40376276274633055,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": false,
+          "detail": "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 80% of segments, so the problem is structural, not accuracy)"
+        },
+        "everySegmentProfiled": {
+          "passed": false,
+          "detail": "9% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.92 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": false,
+      "ranks": {
+        "silhouette": 9,
+        "stabilityARI": 5,
+        "transferARI": 2,
+        "cityNMI": 1,
+        "daviesBouldin": 2
+      },
+      "meanRank": 3.8,
+      "whyNot": [
+        "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 80% of segments, so the problem is structural, not accuracy)",
+        "9% of segments left as 'noise' (limit 5%)",
+        "silhouette 0.22 vs 0.35 for K-Means",
+        "stabilityARI 0.92 vs 0.99 for K-Means"
+      ]
+    },
+    {
+      "key": "hdbscan",
+      "label": "HDBSCAN",
+      "nativePredict": false,
+      "why": "Like DBSCAN but with variable density; still labels points as noise and has no predict.",
+      "complexity": 3,
+      "error": null,
+      "fitSeconds": 3.493,
+      "k": null,
+      "densityParams": {
+        "min_cluster_size": 25
+      },
+      "kCurve": [],
+      "nClusters": 5,
+      "noiseFraction": 0.3543385846461615,
+      "minClusterFraction": 0.02943454686289698,
+      "silhouette": 0.10177001364197315,
+      "daviesBouldin": 1.5889938245751571,
+      "calinskiHarabasz": 301.63520558502074,
+      "cityNMI": 0.07974299232322488,
+      "assignFidelity": 0.5168792198049512,
+      "stabilityARI": 0.9698834339798579,
+      "transferARI": 0.2807612394519732,
+      "transferSilhouette": 0.08222763614393387,
+      "heldOutCities": 3,
+      "gates": {
+        "scoresNewSegments": {
+          "passed": false,
+          "detail": "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 52% of segments, so the problem is structural, not accuracy)"
+        },
+        "everySegmentProfiled": {
+          "passed": false,
+          "detail": "35% of segments left as 'noise' (limit 5%)"
+        },
+        "reproducible": {
+          "passed": true,
+          "detail": "stability ARI 0.97 (minimum 0.60)"
+        }
+      },
+      "passesAllGates": false,
+      "ranks": {
+        "silhouette": 10,
+        "stabilityARI": 4,
+        "transferARI": 4,
+        "cityNMI": 2,
+        "daviesBouldin": 10
+      },
+      "meanRank": 6.0,
+      "whyNot": [
+        "has no native predict: a saved model could not score new segments by itself, so production would need a second 'surrogate' model on top (in this run the surrogate matched the algorithm's own labels for 52% of segments, so the problem is structural, not accuracy)",
+        "35% of segments left as 'noise' (limit 5%)",
+        "silhouette 0.10 vs 0.35 for K-Means",
+        "daviesBouldin 1.59 vs 1.40 for K-Means"
+      ]
+    }
+  ]
+}
