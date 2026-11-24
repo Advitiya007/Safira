@@ -89,7 +89,7 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
 ## 4. Phases and tasks (check off as done; update after each)
 
 - [x] P0 Inspect repo, inventory incident data, write this plan
-- [ ] P1 Dynamic city registry (ML side) + tests; keep `test_config_sync` green for built-ins
+- [x] P1 Dynamic city registry (ML side) + tests; keep `test_config_sync` green for built-ins
 - [ ] P2 Incident ingestion: schema, validation, coverage manifest, dedupe, `inspect-incidents` CLI (reports what exists / what is missing)
 - [ ] P3 Dataset builder: reuse `road_features.csv`, optional municipal CSV features (streetlights, CCTV), time windows, labels with coverage rule, trainability gate
 - [ ] P4 Supervised training: LR, RF, XGB, LGBM, calibration, baselines, splits (LOCO, spatial, temporal), metrics, report, model card, persistence
@@ -101,3 +101,9 @@ Backend gets an equivalent additive loader (separate phase; its own tests).
 ## 5. Log (newest last)
 
 - 2026-11-24 P0 done: inspection + inventory + plan (this file). No code changed yet.
+- 2026-11-24 P1 done. CREATED `ml_service/safira_ml/cities.py` (parse/validate/load; fails loudly on bad file), `ml_service/cities.example.json`, `ml_service/tests/test_cities.py` (12 tests).
+  MODIFIED `safira_ml/config.py` (BUILTIN_CITIES / BUILTIN_CITY_BOUNDING_BOXES kept exactly; `SUPPORTED_CITIES`, `CITY_BOUNDING_BOXES`, new `CITY_META`, `EXTRA_CITIES` now include cities from `SAFIRA_CITIES_FILE` or `ml_service/cities.json`),
+  `tests/test_config_sync.py` (compares built-ins to the Node config), `.gitignore` (cities.json, data/incidents/, data/municipal/).
+  Tests: ML 55 pass (44 + 11 net new; all existing green). CLI `--city` choices and API validators pick up new cities automatically.
+  NOTE: the Node backend still only knows the 3 built-in cities (P6) so a new city also needs P6 + an OSM import before `extract` has data.
+
