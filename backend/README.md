@@ -167,6 +167,12 @@ their selected city's configured box.
 npm run import:osm -- --city=jalandhar --fetch --fresh
 ```
 
+> **Re-import after upgrading the importer.** The Overpass query now also requests `pub`, `bar`,
+> `food_court` and `marketplace` amenities, which route scoring already treats as night-time
+> activity. Existing snapshots do not contain them; re-run the command above for each city to
+> pick them up. Indicators with no mapped data still show as unknown and still lower data
+> confidence: OpenStreetMap coverage of street lights and CCTV is sparse, and nothing is inferred.
+
 `--fetch` is an explicit update operation; normal map, nearby-place, and route
 requests read MongoDB only. The first import can use `--fresh` to establish a
 snapshot; incremental updates omit it and upsert matching OSM IDs. Configure

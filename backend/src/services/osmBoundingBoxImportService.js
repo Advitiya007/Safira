@@ -10,6 +10,11 @@ const RELEVANT_AMENITIES = [
     'police',
     'fuel',
     'bus_station',
+    // Treated as night-time activity by scoring and getOsmFeatureCategories, so they must be fetched too.
+    'pub',
+    'bar',
+    'food_court',
+    'marketplace',
 ];
 
 export const validateCityBoundingBox = (cityId, boxes = CITY_BOUNDING_BOXES) => {

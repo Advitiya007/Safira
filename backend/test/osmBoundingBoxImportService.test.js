@@ -244,3 +244,13 @@ test('route analysis coverage is constrained by each configured city bounding bo
     }, 'jalandhar'), false);
     assert.equal(isRouteInsideCityCoverage({ coordinates: [] }, 'jalandhar'), false);
 });
+
+test('Overpass query requests every amenity that scoring treats as night-time activity', () => {
+    const query = buildCityOverpassQuery('jalandhar');
+    const match = query.match(/\["amenity"~"\^\(([^)]+)\)\$"\]/);
+    assert.ok(match, 'amenity selector present');
+    const requested = match[1].split('|');
+    ['pub', 'bar', 'food_court', 'marketplace', 'restaurant', 'police'].forEach((amenity) => {
+        assert.ok(requested.includes(amenity), `${amenity} should be requested`);
+    });
+});
