@@ -46,7 +46,6 @@ export default function InfrastructureProfile({ infrastructure, routeId }) {
   const shares = profile.clusterShares || [];
   const matchedPercent = shares.reduce((sum, share) => sum + share.percentOfRoute, 0);
   const notProfiledPercent = Math.max(0, 100 - matchedPercent);
-  const dominantInfo = profile.dominantCluster ? data.clusters?.[profile.dominantCluster.clusterId] : null;
 
   return (
     <div className="space-y-2 rounded-lg border border-line bg-canvas p-2" aria-label="Infrastructure profile">
@@ -97,14 +96,23 @@ export default function InfrastructureProfile({ infrastructure, routeId }) {
               </li>
             )}
           </ul>
-          {dominantInfo?.description && (
-            <p className="text-[10px] leading-relaxed text-ink-muted">
-              Most common: <span className="font-semibold">{dominantInfo.name}</span>. {dominantInfo.description}
-            </p>
-          )}
         </>
       )}
     </div>
+  );
+}
+
+// Longer wording for the "Why this route?" details panel (kept off the card itself).
+export function InfrastructureProfileDetail({ infrastructure, routeId }) {
+  if (infrastructure?.status !== 'ready') return null;
+  const { data } = infrastructure;
+  const profile = (data.routes || []).find((item) => String(item.routeId) === String(routeId));
+  const dominantInfo = profile?.dominantCluster ? data.clusters?.[profile.dominantCluster.clusterId] : null;
+  if (!dominantInfo?.description) return null;
+  return (
+    <p>
+      Most common infrastructure profile: <span className="font-semibold text-ink">{dominantInfo.name}</span>. {dominantInfo.description}
+    </p>
   );
 }
 

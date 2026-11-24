@@ -18,6 +18,7 @@ Python venv with all deps: `/home/claude/mlenv/bin/python`. Run ML tests: `cd ml
 | 5. Frontend display next to indicators | DONE - build ok, only the pre-existing Map.jsx lint error remains |
 | 6. Docs: `ml_service/README.md`, backend README, root README | DONE |
 | 7. REAL run on owner's data: `extract` -> `evaluate` -> `train` | NOT DONE - needs the owner's MongoDB (sandbox has none, cannot reach Overpass) |
+| 8. Route card redesign (hide unknown indicators, "Why this route?" + "About these scores" disclosures) + importer amenity fix | DONE - backend 74/74, frontend 4/4, build ok, lint = same 13 pre-existing problems as baseline |
 
 NEXT STEP (owner action, needs the real MongoDB): follow `ml_service/README.md` "Run it" -> `extract --city all`, `evaluate`,
 READ `reports/evaluation_report.md` (is k sensible? does city dominate? are cluster names honest?), then `train --scope global`, `serve`,
@@ -134,3 +135,17 @@ There are NO `police`, `hospital`, `pharmacy`, `shops` categories. Those classes
   Synthetic demo outcome (not evidence): native-predict gate eliminated Ward/Spectral/DBSCAN/HDBSCAN; DBSCAN/HDBSCAN ~45% noise; K-Means/MiniBatch/Bisecting tied -> K-Means by parsimony.
   Learnings: shared-axis `invert_yaxis()` called per panel cancels out (call once); DBSCAN silhouette is computed on kept points only so it looks inflated - always show the noise column; sklearn 1.9 HDBSCAN needs `copy=True` to avoid FutureWarning.
   NEXT STEP: owner runs `compare` on REAL data (after `extract`), reads `reports/algorithm_comparison.md`; if a non-K-Means method clearly wins on all fair metrics, discuss before changing `training.py`.
+- 2026-11-24: Route card redesign + importer fix DONE. User asked to hide Unknown indicators, hide long explanations behind a button, and fetch missing data via API if possible.
+  DIAGNOSIS: the 4 Unknowns (night-time activity, lighting, mapped CCTV, mapped activity proximity) are `null` because no OSM records of those kinds were stored near the route (OSM coverage of lamps/CCTV/open-late businesses is sparse in Indian cities).
+  Score uses full mode weights (unknown adds 0) and confidence = 100 x coverageRatio x (0.7+0.3 x activityHoursReliability) x freshness x (truncated?0.5:1); recommendation needs confidence >= 35 (`MINIMUM_RECOMMENDATION_CONFIDENCE`).
+  HIDING UNKNOWNS IN THE UI DOES NOT CHANGE SCORE (13/100), CONFIDENCE (16%) OR THE RECOMMENDATION. Recomputing confidence without them would inflate it dishonestly -> not done. Only real data raises confidence.
+  CREATED `frontend/src/utils/routeCardModel.js` (pure: `SCORE_LABELS`, `splitIndicators`, `getConfidenceSummary`, `getRecommendationReview`), `frontend/test/routeCardModel.test.js` (4 tests).
+  MODIFIED `frontend/src/components/Map/SafeRoutePanel.jsx` (card shows only known indicators as `score/100 - coverage%`; separate select button + `Why this route?` disclosure with Recommendation / Data confidence / Route notes; global disclaimer, weights, timestamp, ML note under `About these scores`; unknowns listed once in the details with "not evidence the route is unsafe"; kept `Low data confidence` badge and `No route recommended` chip),
+  `InfrastructureProfile.jsx` (+`InfrastructureProfileDetail`; long sentence moved off the card), `frontend/package.json` (`"test": "node --test"`; `node --test test/` fails on Node 22).
+  MODIFIED `backend/src/services/osmBoundingBoxImportService.js`: `RELEVANT_AMENITIES` += pub, bar, food_court, marketplace (scoring and `getOsmFeatureCategories` already treat them as activity but the Overpass query never fetched them). Test added in `backend/test/osmBoundingBoxImportService.test.js`.
+  OWNER ACTION to benefit: re-import each city `npm run import:osm -- --city=<city> --fetch --fresh`, then `python -m safira_ml.cli extract --city all` (and retrain if desired). Not verifiable in the sandbox (no Overpass/Mongo).
+  EXTERNAL DATA SOURCES: none added. No free key-less API for Indian CCTV/street lights; sandbox cannot reach any API to test. Options needing owner decision: Overture Maps places (offline), Mapillary (key; street lights), Foursquare (key).
+  Learnings: a check for "Data confidence: 16%" on `innerText` fails because of CSS uppercase (use case-insensitive match); no nested buttons - card wrapper div + sibling buttons.
+  NEXT STEP: owner re-imports city data with the amenity fix and reviews whether Unknowns drop; decide on an external source; owner still needs to do step 7 (real `extract`/`evaluate`/`train`).
+- 2026-11-24 (later): Re-tested external APIs with the session proxy configured. Overpass (overpass-api.de, kumi.systems, private.coffee), Mapillary, Overture S3, Nominatim, Open-Meteo and HDX all returned `CONNECT tunnel failed, response 403` (egress allowlist policy; do not retry or bypass). WebFetch also refused (URL >250 chars / not allowlisted).
+  => No external data source can be tested from this sandbox. Any new source must be built against documented schemas and mocked tests, then verified by the owner locally. Candidate: converter from Overture Maps places (downloaded locally) to the existing `--file=*.geojsonl` import path.

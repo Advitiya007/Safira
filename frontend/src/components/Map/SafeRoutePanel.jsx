@@ -1,16 +1,15 @@
-import React from 'react';
-import { Clock, Loader2, MapPin, Route, Search, X } from 'lucide-react';
-import InfrastructureProfile, { InfrastructureProfileNote } from './InfrastructureProfile';
-
-const SCORE_LABELS = {
-  nightActivity: 'night-time activity',
-  lighting: 'lighting',
-  roadAccessibility: 'road access',
-  cctv: 'mapped CCTV',
-  emergencyAccess: 'emergency proximity',
-  publicTransport: 'public transport',
-  isolation: 'mapped activity proximity',
-};
+import React, { useState } from 'react';
+import { ChevronDown, Clock, Loader2, MapPin, Route, Search, X } from 'lucide-react';
+import InfrastructureProfile, {
+  InfrastructureProfileDetail,
+  InfrastructureProfileNote,
+} from './InfrastructureProfile';
+import {
+  SCORE_LABELS,
+  getConfidenceSummary,
+  getRecommendationReview,
+  splitIndicators,
+} from '../../utils/routeCardModel';
 
 export function SafeRouteControls({
   cities,
@@ -213,6 +212,68 @@ export function SafeRouteControls({
   );
 }
 
+const SECTION_HEADING = 'text-[10px] font-black uppercase tracking-widest text-ink-muted';
+
+function RouteDetails({ id, route, index, routeMetadata, infrastructure }) {
+  const minimumConfidence = routeMetadata?.minimumRecommendationConfidence;
+  const confidence = getConfidenceSummary(route, minimumConfidence);
+  const review = getRecommendationReview(route, index, routeMetadata);
+  return (
+    <div
+      id={id}
+      role="region"
+      aria-label={`Details for Route ${index + 1}`}
+      className="mt-2 space-y-3 rounded-lg bg-canvas p-3 text-[11px] leading-relaxed text-ink-muted"
+    >
+      <section className="space-y-1">
+        <h4 className={SECTION_HEADING}>Recommendation</h4>
+        <p className="font-semibold text-ink">{review.headline}</p>
+        {review.reason && <p>{review.reason}</p>}
+        {review.note && <p>{review.note}</p>}
+      </section>
+
+      <section className="space-y-1">
+        <h4 className={SECTION_HEADING}>Data confidence{confidence.percent !== null ? `: ${confidence.percent}%` : ''}</h4>
+        {confidence.threshold !== null && (
+          <p>
+            A route needs at least {confidence.threshold}% to be recommended
+            {confidence.percent !== null && (confidence.isLow ? '; this route is below that.' : '; this route meets it.')}
+          </p>
+        )}
+        <p>
+          Confidence reflects how many indicators had mapped data along the route, how many mapped
+          businesses list opening hours, and how recent the map data is.
+        </p>
+        {confidence.totalCount > 0 && (
+          <p>
+            Mapped data was found for {confidence.knownCount} of {confidence.totalCount} indicators
+            {confidence.coveredDistancePercent !== null
+              ? `, covering ${confidence.coveredDistancePercent}% of the route distance with at least one.`
+              : '.'}
+          </p>
+        )}
+        {confidence.missingLabels.length > 0 && (
+          <p>
+            No mapped data on this route for: {confidence.missingLabels.join(', ')}. That lowers confidence;
+            it is not evidence that the route is unsafe.
+          </p>
+        )}
+      </section>
+
+      {route.explanations?.length > 0 && (
+        <section className="space-y-1">
+          <h4 className={SECTION_HEADING}>Route notes</h4>
+          <ul className="list-disc space-y-1 pl-4">
+            {route.explanations.map((explanation) => <li key={explanation}>{explanation}</li>)}
+          </ul>
+        </section>
+      )}
+
+      <InfrastructureProfileDetail infrastructure={infrastructure} routeId={route.id} />
+    </div>
+  );
+}
+
 export function SafeRouteAlternatives({
   routeError,
   routes,
@@ -224,6 +285,11 @@ export function SafeRouteAlternatives({
   routeMetadata,
   infrastructure,
 }) {
+  const [openDetailsKey, setOpenDetailsKey] = useState(null);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const analysisKey = String(routeMetadata?.analysisId ?? 'analysis');
+  const minimumConfidence = routeMetadata?.minimumRecommendationConfidence;
+
   return (
     <>
       {routeError && (
@@ -233,120 +299,145 @@ export function SafeRouteAlternatives({
       )}
       {routes.length > 0 && (
         <section aria-label="Route alternatives" className="space-y-3">
-          {routeMetadata?.recommendationMessage && (
-            <div
-              role={routeMetadata.recommendationStatus === 'insufficient_data' ? 'status' : 'note'}
-              className={`rounded-xl border p-3 text-xs font-semibold ${
-                routeMetadata.recommendationStatus === 'insufficient_data'
-                  ? 'border-warning/20 bg-warning/10 text-warning'
-                  : 'border-primary-container/20 bg-primary-container/5 text-primary'
-              }`}
-            >
-              {routeMetadata.recommendationMessage}
-            </div>
-          )}
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-ink-muted">Route alternatives</p>
-            <p className="mt-1 text-[11px] text-ink-muted">
-              {mode === 'walking' ? 'Walking' : 'Driving'} alternatives, ranked by mapped indicators for {cityName || 'the selected city'}.
+          <div className="flex items-center justify-between gap-2">
+            <p className={SECTION_HEADING}>
+              Route alternatives · {mode === 'walking' ? 'Walking' : 'Driving'}{cityName ? ` · ${cityName}` : ''}
             </p>
+            {routeMetadata?.recommendationStatus === 'insufficient_data' && (
+              <span role="status" className="rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-bold text-warning">
+                No route recommended
+              </span>
+            )}
           </div>
           {routes.map((route, index) => {
             const isSelected = index === selectedRouteIndex;
             const hasScore = Number.isFinite(route.score);
+            const { known } = splitIndicators(route.indicators);
+            const confidence = getConfidenceSummary(route, minimumConfidence);
+            const detailsKey = `${analysisKey}:${route.id}`;
+            const detailsId = `route-details-${route.id}`;
+            const isOpen = openDetailsKey === detailsKey;
+            const showNearestEmergency = route.nearestEmergencyFacilityMeters !== null
+              && route.nearestEmergencyFacilityMeters !== undefined;
             return (
-              <button
-                type="button"
+              <div
                 key={route.id}
-                onClick={() => onSelectRoute(index)}
-                className={`w-full rounded-2xl border p-4 text-left transition-colors ${isSelected ? 'border-primary-container bg-primary-container/5' : 'border-line hover:border-primary-container/50'}`}
+                className={`rounded-2xl border p-4 transition-colors ${isSelected ? 'border-primary-container bg-primary-container/5' : 'border-line hover:border-primary-container/50'}`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-bold text-sm text-ink">
-                    {hasScore && index === recommendedRouteIndex ? 'Recommended · ' : ''}Route {index + 1}
-                  </span>
-                  {hasScore ? (
-                    <span className="rounded-full bg-primary-container/10 px-2 py-1 text-[10px] font-black text-primary-container">
-                      {route.score}/100 mapped-indicator score
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => onSelectRoute(index)}
+                  className="block w-full text-left"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-bold text-sm text-ink">
+                      {hasScore && index === recommendedRouteIndex ? 'Recommended · ' : ''}Route {index + 1}
                     </span>
-                  ) : (
-                    <span className="text-[10px] font-semibold text-ink-muted">Indicators unavailable</span>
-                  )}
-                </div>
-                <div className="mt-2 flex gap-4 text-xs font-semibold text-ink-muted">
-                  <span>{(route.distanceMeters / 1000).toFixed(1)} km</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> {Math.round(route.durationSeconds / 60)} min
-                  </span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] font-semibold text-ink-muted">
-                    Data confidence: {route.confidence}% · {route.scoredSegmentCoveragePercent}% of distance had at least one scored indicator
-                  </p>
-                  {route.indicators && (
-                    <dl className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg bg-canvas p-2 text-[10px] text-ink-muted">
-                      {Object.entries(route.indicators).map(([indicator, value]) => (
-                        <div key={indicator} className="flex justify-between gap-2">
-                          <dt>{SCORE_LABELS[indicator] || indicator}</dt>
-                          <dd className="text-right font-semibold">
-                            {value.score === null
-                              ? 'Unknown'
-                              : `${value.score}/100 · ${value.coveragePercent}% coverage`}
-                          </dd>
+                    {hasScore && (
+                      <span className="rounded-full bg-primary-container/10 px-2 py-1 text-[10px] font-black text-primary-container">
+                        {route.score}/100 mapped-indicator score
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-ink-muted">
+                    <span>{(route.distanceMeters / 1000).toFixed(1)} km</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> {Math.round(route.durationSeconds / 60)} min
+                    </span>
+                    {confidence.isLow && (
+                      <span className="rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-bold text-warning">
+                        Low data confidence
+                      </span>
+                    )}
+                  </div>
+                  {(known.length > 0 || showNearestEmergency) && (
+                    <dl className="mt-3 grid grid-cols-1 gap-y-1 rounded-lg bg-canvas p-2 text-[10px] text-ink-muted">
+                      {known.map(({ key, label, score, coveragePercent }) => (
+                        <div key={key} className="flex justify-between gap-2">
+                          <dt>{label}</dt>
+                          <dd className="text-right font-semibold">{`${score}/100 · ${coveragePercent}%`}</dd>
                         </div>
                       ))}
-                      <div className="col-span-2 flex justify-between gap-2 border-t border-line pt-1">
-                        <dt>Nearest mapped emergency facility</dt>
-                        <dd className="text-right font-semibold">
-                          {route.nearestEmergencyFacilityMeters === null
-                            ? 'None mapped within 1 km'
-                            : `${route.nearestEmergencyFacilityMeters} m straight-line`}
-                        </dd>
-                      </div>
+                      {showNearestEmergency && (
+                        <div className="flex justify-between gap-2 border-t border-line pt-1">
+                          <dt>Nearest mapped emergency facility</dt>
+                          <dd className="text-right font-semibold">{route.nearestEmergencyFacilityMeters} m straight-line</dd>
+                        </div>
+                      )}
                     </dl>
                   )}
+                </button>
+                <div className="mt-2 space-y-1">
                   <InfrastructureProfile infrastructure={infrastructure} routeId={route.id} />
-                  {route.rankingReason && (
-                    <p className="text-[11px] font-semibold text-primary">{route.rankingReason}</p>
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={detailsId}
+                    onClick={() => setOpenDetailsKey(isOpen ? null : detailsKey)}
+                    className="flex min-h-9 items-center gap-1 text-xs font-bold text-primary-container"
+                  >
+                    Why this route?
+                    <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                  </button>
+                  {isOpen && (
+                    <RouteDetails
+                      id={detailsId}
+                      route={route}
+                      index={index}
+                      routeMetadata={routeMetadata}
+                      infrastructure={infrastructure}
+                    />
                   )}
-                  <ul className="list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-ink-muted">
-                    {route.explanations.map((explanation) => <li key={explanation}>{explanation}</li>)}
-                  </ul>
                 </div>
-              </button>
+              </div>
             );
           })}
-          <p className="text-[10px] leading-relaxed text-ink-muted">
-            The mapped-indicator score uses the full mode-specific weights; unknown indicators add no positive evidence and are not treated as proof of danger. Emergency distance is straight-line, not a measure of road-network access. Confidence is separate. This is not a crime-risk prediction or a safety guarantee.
-          </p>
-          <InfrastructureProfileNote infrastructure={infrastructure} />
-          {routeMetadata?.scoringWeights && (
-            <p className="text-[10px] leading-relaxed text-ink-muted">
-              Configured indicator weights: {Object.entries(routeMetadata.scoringWeights)
-                .map(([indicator, weight]) => `${SCORE_LABELS[indicator] || indicator} ${Math.round(weight * 100)}%`)
-                .join(' · ')}.
-            </p>
-          )}
-          {routeMetadata?.osmDataTimestamp && (
-            <p className="text-[10px] text-ink-muted">
-              OSM feature data timestamp: {new Date(routeMetadata.osmDataTimestamp).toLocaleDateString()}
-            </p>
-          )}
-          {routeMetadata?.dataCoverage && (
-            <div className="space-y-1 text-[10px] text-ink-muted">
-              <p>
-                Imported OSM features: {routeMetadata.dataCoverage.featureCount.toLocaleString()} · category counts show mapped records, not data completeness.
-              </p>
-              <p>
-                {Object.entries(routeMetadata.dataCoverage.coverage || {})
-                  .map(([category, count]) => `${category}: ${count}`)
-                  .join(' · ') || 'No category coverage reported'}
-              </p>
-              {routeMetadata.dataCoverage.featureQueryTruncated && (
-                <p className="font-semibold text-warning">Route data query reached its record limit; results may be incomplete.</p>
-              )}
-            </div>
-          )}
+          <div>
+            <button
+              type="button"
+              aria-expanded={aboutOpen}
+              aria-controls="route-analysis-about"
+              onClick={() => setAboutOpen((open) => !open)}
+              className="flex min-h-9 items-center gap-1 text-[11px] font-bold text-ink-muted"
+            >
+              About these scores
+              <ChevronDown className={`h-3 w-3 transition-transform ${aboutOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+            {aboutOpen && (
+              <div id="route-analysis-about" className="mt-1 space-y-2 text-[10px] leading-relaxed text-ink-muted">
+                <p>
+                  The mapped-indicator score uses the full mode-specific weights; unknown indicators add no positive evidence and are not treated as proof of danger. Emergency distance is straight-line, not a measure of road-network access. Confidence is separate. This is not a crime-risk prediction or a safety guarantee.
+                </p>
+                <InfrastructureProfileNote infrastructure={infrastructure} />
+                {routeMetadata?.scoringWeights && (
+                  <p>
+                    Configured indicator weights: {Object.entries(routeMetadata.scoringWeights)
+                      .map(([indicator, weight]) => `${SCORE_LABELS[indicator] || indicator} ${Math.round(weight * 100)}%`)
+                      .join(' · ')}.
+                  </p>
+                )}
+                {routeMetadata?.osmDataTimestamp && (
+                  <p>OSM feature data timestamp: {new Date(routeMetadata.osmDataTimestamp).toLocaleDateString()}</p>
+                )}
+                {routeMetadata?.dataCoverage && (
+                  <>
+                    <p>
+                      Imported OSM features: {routeMetadata.dataCoverage.featureCount.toLocaleString()} · category counts show mapped records, not data completeness.
+                    </p>
+                    <p>
+                      {Object.entries(routeMetadata.dataCoverage.coverage || {})
+                        .map(([category, count]) => `${category}: ${count}`)
+                        .join(' · ') || 'No category coverage reported'}
+                    </p>
+                    {routeMetadata.dataCoverage.featureQueryTruncated && (
+                      <p className="font-semibold text-warning">Route data query reached its record limit; results may be incomplete.</p>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </section>
       )}
     </>
