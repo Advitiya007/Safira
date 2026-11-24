@@ -131,6 +131,27 @@ level (one sequential hue, darker = more *mapped* infrastructure) per city, plus
 segments per level. It uses the saved model and is **descriptive only**: it is not a safety map,
 sparse mapping looks the same as sparse infrastructure, and it does not feed route scores.
 
+## Supervised pipeline: training data (P4.1)
+
+`risk/training_data.py` + `risk/preprocess.py` prepare P3 datasets for models. **No model is trained here.**
+
+```bash
+python -m safira_ml.cli inspect-training-data --dataset data/datasets --origin synthetic   # or dataset_<id> dir; --origin real
+```
+
+```python
+from safira_ml.risk.training_data import load_training_data
+from safira_ml.risk.preprocess import RiskPreprocessor, LINEAR, TREE, BOOSTING
+
+data = load_training_data(path, origin="synthetic")      # X, y, meta (city, lat/lon, period), provenance, watermark
+pre = RiskPreprocessor(LINEAR).fit(data.X[train_mask])   # statistics from TRAINING rows only
+M = pre.transform(data.X[test_mask])
+```
+
+- Predictors: infrastructure numerics (`MODEL_NUMERIC_CANDIDATES`), `road_group`, `time_band`, optional cyclical month. Everything else is metadata or excluded with a stated reason (`EXCLUDED_COLUMNS`); an unclassified column in a future P3 schema is refused.
+- City id, segment key, coordinates and period are kept in `meta` for geographic/temporal validation and are never predictors.
+- `origin` must match the dataset; synthetic data carries a watermark and can never be loaded as real or mixed with it; real data must pass P3's trainability gate.
+
 ## Algorithm comparison
 
 K-Means was chosen as the starting point, then benchmarked against nine alternatives (MiniBatch and

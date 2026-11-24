@@ -201,6 +201,20 @@ def cmd_build_dataset(args) -> int:
     return 0 if result.trainable else 3
 
 
+def cmd_inspect_training_data(args) -> int:
+    """P4.1: load a P3 dataset through the training-data loader and print what a model would see (no training)."""
+    import json as _json
+    from .risk.labels import NotTrainableError
+    from .risk.training_data import TrainingDataError, load_training_data
+    try:
+        data = load_training_data(Path(args.dataset), args.origin, enforce_gate=not args.no_gate)
+    except (TrainingDataError, NotTrainableError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    print(_json.dumps(data.describe(), indent=2, default=str))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="safira_ml", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -269,6 +283,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--mongo-collection", help="backend incident-report collection (must be named explicitly)")
     p.add_argument("--field-map", help="JSON overriding backend field names")
     p.set_defaults(func=cmd_build_dataset)
+
+    p = sub.add_parser("inspect-training-data", help="P4.1: show the X/y/metadata a model would be trained on (no training)")
+    p.add_argument("--dataset", required=True, help="dataset_<id> directory, or the datasets root (uses latest*.json)")
+    p.add_argument("--origin", required=True, choices=["real", "synthetic"], help="must match the dataset (never mixed)")
+    p.add_argument("--no-gate", action="store_true", help="inspect a real dataset that does not pass the trainability gate")
+    p.set_defaults(func=cmd_inspect_training_data)
 
     p = sub.add_parser("assign", help="write cluster assignments into RoadSegmentFeature")
     p.add_argument("--scope", default="global")
